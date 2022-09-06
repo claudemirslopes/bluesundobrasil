@@ -1,4 +1,13 @@
-    <!-- PARRA LATERAL - SIDEBAR -->
+<style>
+    .form-control {
+        border: 1px solid #585858;
+    }
+    .border {
+        border: 1px solid #848484 !important;
+    }
+</style>
+
+<!-- PARRA LATERAL - SIDEBAR -->
     <?php $this->load->view('layout/sidebar') ?>
     <!-- PARRA LATERAL - SIDEBAR -->
 
@@ -34,16 +43,18 @@
         </div>
 
         <!-- content -->
-        <div class="content mt-3">
+        <div class="content mt-1">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-secondary text-light">
                     <strong class="card-title" v-if="headerText">Editar Conta a Receber</strong>
                     <span class="float-right" style="color: #777;font-size: .9em;">
                         <strong><i class="fa fa-clock-o"></i>&nbsp;&nbsp;Última alteração: </strong><?php echo formata_data_banco_com_hora($conta_receber->conta_receber_data_alteracao); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <a title="Voltar" href="<?php echo base_url('contas_receber'); ?>" class="btn btn-success btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
+                        <a title="Voltar" href="<?php echo base_url('contas_receber'); ?>" class="btn btn-light btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
                     </span>
                 </div>
                 
+                <div class="card-body" style="border: 1px solid #A4A4A4;">
+                    
                 <!-- Mensagem de sucesso -->
                 <?php if ($message = $this->session->flashdata('sucesso')): ?>
                     <div class="alert  alert-success alert-dismissible fade show " role="alert">
@@ -68,24 +79,24 @@
                 <?php endif; ?>
                 <!-- Mensagem de erro -->
                 
-                <div class="card-body">
+                
                     <form method="post" name="form_edit" class="user">
                         
                         <fieldset class="border p-2" style="margin-top: -10px;">
                             <legend class="font-small"><i class="fa fa-credit-card-alt"></i> Dados da conta</legend>
                             <div class="form-row">
                                 <div class="form-group col-md-5">
-                                    <label for="conta_receber_cliente_id">Fornecedor <span style="color: red;font-weight: bold;">*</span></label> 
-                                    <select name="conta_receber_cliente_id" class="custom-select contas_receber">
+                                    <label for="conta_receber_cliente_id">Autorizado <span style="color: red;font-weight: bold;">*</span></label> 
+                                    <select style="pointer-events: none;touch-action: none;" name="conta_receber_cliente_id" class="form-control custom-select">
                                         <?php foreach($clientes as $cliente): ?>
-                                        <option value="<?php echo $cliente->cliente_id ?>" <?php echo ($cliente->cliente_id == $conta_receber->conta_receber_cliente_id ? 'selected' : ''); ?>><?php echo $cliente->cliente_nome ?></option>
+                                        <option value="<?php echo $cliente->cliente_id ?>" <?php echo ($cliente->cliente_id == $conta_receber->conta_receber_cliente_id ? 'selected' : ''); ?>><?php echo $cliente->cliente_nome.'&nbsp;'.$cliente->cliente_sobrenome ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                     <?php echo form_error('conta_receber_cliente_id', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                                 <div class="form-group col-md-2">
                                     <label for="conta_receber_valor">Valor <span style="color: red;font-weight: bold;">*</span></label>
-                                    <input  <?php echo ($conta_receber->conta_receber_status == 1 ? 'readonly' : '');?> type="text" name="conta_receber_valor" class="form-control form-control-user money" id="conta_receber_valor" placeholder="Ex: 99,99" value="<?php echo $conta_receber->conta_receber_valor; ?>">
+                                    <input  <?php echo ($conta_receber->conta_receber_status == 1 ? 'readonly' : '');?> type="text" name="conta_receber_valor" class="form-control form-control-user money2" id="conta_receber_valor" placeholder="Ex: 99,99" value="<?php echo $conta_receber->conta_receber_valor; ?>">
                                     <?php echo form_error('conta_receber_valor', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                                 <div class="form-group col-md-3">
@@ -120,7 +131,7 @@
                         </fieldset>
                         
                         <input type="hidden" name="conta_receber_id" value="<?php echo $conta_receber->conta_receber_id; ?>">
-                        <?php echo ($conta_receber->conta_receber_status == 1 ? '<button type="submit" class="btn btn-primary btn-sm float-right mt-1" style="display:none;" disabled><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Editar conta a receber</button><span class="badge badge-light float-right mt-1"><i class="fa fa-thumbs-up" aria-hidden="true"></i>&nbsp;&nbsp;ESTA CONTA FOI PAGA NO DIA&nbsp;'.formata_data_banco_com_hora($conta_receber->conta_receber_data_pagamento).'</span>' : '<button type="submit" class="btn btn-primary btn-sm float-right mt-1"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Editar conta a receber</button>'); ?>
+                        <?php echo ($conta_receber->conta_receber_status == 1 ? '<button type="submit" class="btn btn-primary btn-sm float-right mt-1" style="display:none;" disabled><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Editar conta a receber</button><span class="badge badge-light float-right mt-1"><i class="fa fa-thumbs-up" aria-hidden="true"></i>&nbsp;&nbsp;ESTA CONTA FOI PAGA PELO CLIENTE NO DIA&nbsp;'.formata_data_banco_com_hora($conta_receber->conta_receber_data_pagamento).'</span>' : '<button type="submit" class="btn btn-primary btn-sm float-right mt-1"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Editar conta a receber</button>'); ?>
                         
                     </form>
                 </div>

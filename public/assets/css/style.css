@@ -946,6 +946,15 @@
 .bg-flat-color-5 {
   background: #4dbd74; }
 
+.bg-flat-color-6 {
+  background: #848484; }
+
+.bg-flat-color-7 {
+  background: #585858; }
+
+.bg-flat-color-8 {
+  background: #2E2E2E; }
+
 .transition {
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease; }
@@ -1105,7 +1114,8 @@ aside.left-panel {
         line-height: 30px;
         padding: 0 3px 0 0;
         position: relative;
-        width: 100%; }
+        width: 100%;
+        font-weight: bolder; }
         .navbar #prr li > a {
         color: #777 !important; }
         .navbar #prr li > a:hover {
@@ -1147,15 +1157,23 @@ aside.left-panel {
           .navbar .navbar-nav li.menu-item-has-children a:hover:before {
             color: #fff; }
         .navbar .navbar-nav li.menu-item-has-children .sub-menu {
-          background: #272c33;
+          background: #fff;
+          color: #333 !important;
           border: none;
           box-shadow: none;
           overflow-y: hidden;
           padding: 0 0 0 35px; }
+          .navbar .navbar-nav li.menu-item-has-children .sub-menu a {
+          color: #272C33 !important; }
+          .navbar .navbar-nav li.menu-item-has-children .sub-menu a:hover {
+          color: #494E55 !important; }
+          .navbar .navbar-nav li.menu-item-has-children .sub-menu i {
+          color: #272C33 !important; }
+          .navbar .navbar-nav li.menu-item-has-children .sub-menu i:hover {
+          color: #494E55 !important; }
           .navbar .navbar-nav li.menu-item-has-children .sub-menu li {
             position: relative; }
           .navbar .navbar-nav li.menu-item-has-children .sub-menu i {
-            color: #c8c9ce;
             float: left;
             padding: 0;
             position: absolute;
@@ -1320,7 +1338,7 @@ body.open .navbar .navbar-brand.hidden {
       content: "/\00a0"; }
 
 .right-panel header.header {
-  background: #FF9400;
+  background-image: linear-gradient( to right, #F87002, #FF8100, #FFAD00, #FEBB00 );
   border-bottom: 4px solid #47AA0B;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
   clear: both;
@@ -1490,6 +1508,10 @@ header .form-inline {
     padding: 0 !important;
     text-overflow: ellipsis; }
 
+  .dropdown-item:hover {
+      background: #139213;
+      color: #fff;
+  }
 .user-area {
   float: right;
   padding-right: 0;
@@ -1517,7 +1539,8 @@ header .form-inline {
   .user-area .user-avatar {
     float: right;
     margin-top: 4px;
-    width: 32px; }
+    width: 32px;
+    height: 32px; }
   .user-area .user-info .name {
     color: #8c8c8c;
     font-size: 14px;

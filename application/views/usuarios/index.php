@@ -1,3 +1,11 @@
+<style>
+    .form-control {
+        border: 1px solid #585858;
+    }
+    .border {
+        border: 1px solid #848484 !important;
+    }
+</style>
 
     <!-- PARRA LATERAL - SIDEBAR -->
     <?php $this->load->view('layout/sidebar') ?>
@@ -35,12 +43,14 @@
         </div>
 
         <!-- content -->
-        <div class="content mt-3">
+        <div class="content mt-1">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-secondary text-light">
                     <strong class="card-title" v-if="headerText">Colaboradores</strong>
-                    <a title="Cadastrar usuário" href="<?php echo base_url('usuarios/add'); ?>" class="btn btn-success btn-sm float-right"><i class="fa fa-user-plus" aria-hidden="true"></i>&nbsp;Novo colaborador</a>
+                    <a title="Cadastrar usuário" href="<?php echo base_url('usuarios/add'); ?>" class="btn btn-light btn-sm float-right"><i class="fa fa-user-plus" aria-hidden="true"></i>&nbsp;Novo colaborador</a>
                 </div>
+                
+                <div class="card-body" style="border: 1px solid #A4A4A4;">
                 
                 <!-- Mensagem de sucesso -->
                 <?php if ($message = $this->session->flashdata('sucesso')): ?>
@@ -66,7 +76,7 @@
                 <?php endif; ?>
                 <!-- Mensagem de erro -->
                 
-                <div class="card-body">
+               
                    <table class="bootstrap-data-table-export table table-striped table-bordered">
                         <thead>
                             <tr>
@@ -75,7 +85,6 @@
                                 <th>Usuário</th>
                                 <th>Login</th>
                                 <th class="text-center">Ativo</th>
-                                <th>Perfil</th>
                                 <th class="text-right">Ações</th>
                             </tr>
                         </thead>
@@ -83,13 +92,12 @@
                             <?php foreach ($usuarios as $user): ?>
                             <tr>
                                 <td class="text-center"><?php echo $user->id ?></td>
-                                <td><?php echo $user->first_name ?>&nbsp;<?php echo $user->last_name ?></td>
-                                <td><?php echo $user->username ?></td>
-                                <td><?php echo $user->email ?></td>
+                                <td><?php echo $user->first_name; ?>&nbsp;<?php echo $user->last_name; ?></td>
+                                <td><?php echo $user->username; ?></td>
+                                <td><?php echo $user->email; ?></td>
                                 <td class="text-center pr-4">
                                     <?php echo $user->active == 1 ? '<span class="badge badge-success btn-sm">Sim</span>' : '<span class="badge badge-danger btn-sm">Não</span>' ?>
                                 </td>
-                                <td><?php echo ($this->ion_auth->is_admin($user->id) ? 'Administrador' : 'Vendedor'); ?></td>
                                 <td class="text-right">
                                     <a href="<?php echo base_url('usuarios/edit/'.$user->id); ?>" class="btn btn-sm btn-primary" title="Editar"><i class="fa fa-pencil"></i></a>
                                     <a href="javascript(void)" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#user-<?php echo $user->id; ?>" title="Excluír"><i class="fa fa-user-times" aria-hidden="true"></i></a>

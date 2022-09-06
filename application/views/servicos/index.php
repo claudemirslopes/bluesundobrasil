@@ -1,3 +1,11 @@
+<style>
+    .form-control {
+        border: 1px solid #585858;
+    }
+    .border {
+        border: 1px solid #848484 !important;
+    }
+</style>
 
     <!-- PARRA LATERAL - SIDEBAR -->
     <?php $this->load->view('layout/sidebar') ?>
@@ -35,13 +43,15 @@
         </div>
 
         <!-- content -->
-        <div class="content mt-3">
+        <div class="content mt-1">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-secondary text-light">
                     <strong class="card-title" v-if="headerText">Serviços</strong>
-                    <a title="Cadastrar novo servico" href="<?php echo base_url('servicos/add'); ?>" class="btn btn-success btn-sm float-right"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;Novo servico</a>
+                    <a title="Cadastrar novo servico" href="<?php echo base_url('servicos/add'); ?>" class="btn btn-light btn-sm float-right"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;Novo serviço</a>
                 </div>
                 
+                <div class="card-body" style="border: 1px solid #A4A4A4;">
+                    
                 <!-- Mensagem de sucesso -->
                 <?php if ($message = $this->session->flashdata('sucesso')): ?>
                     <div class="alert  alert-success alert-dismissible fade show " role="alert">
@@ -66,7 +76,19 @@
                 <?php endif; ?>
                 <!-- Mensagem de erro -->
                 
-                <div class="card-body">
+                <!-- Mensagem de info -->
+                <?php if ($message = $this->session->flashdata('info')): ?>
+                    <div class="alert  alert-warning alert-dismissible fade show " role="alert">
+                        <span class="badge badge-pill badge-warning"><i class="fa fa-exclamation-circle" aria-hidden="true"></i>&nbsp;&nbsp;Advertência</span>&nbsp;&nbsp;
+                         <?php echo $message; ?>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <?php endif; ?>
+                <!-- Mensagem de info -->
+                
+               
                    <table class="bootstrap-data-table-export table table-striped table-bordered">
                         <thead>
                             <tr>

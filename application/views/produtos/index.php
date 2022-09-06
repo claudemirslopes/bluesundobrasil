@@ -1,3 +1,11 @@
+<style>
+    .form-control {
+        border: 1px solid #585858;
+    }
+    .border {
+        border: 1px solid #848484 !important;
+    }
+</style>
 
     <!-- PARRA LATERAL - SIDEBAR -->
     <?php $this->load->view('layout/sidebar') ?>
@@ -35,13 +43,15 @@
         </div>
 
         <!-- content -->
-        <div class="content mt-3">
+        <div class="content mt-1">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-secondary text-light">
                     <strong class="card-title" v-if="headerText">Produtos</strong>
-                    <a title="Cadastrar novo produto" href="<?php echo base_url('produtos/add'); ?>" class="btn btn-success btn-sm float-right"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;Novo produto</a>
+                    <a title="Cadastrar novo produto" href="<?php echo base_url('produtos/add'); ?>" class="btn btn-light btn-sm float-right"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;Novo produto</a>
                 </div>
                 
+                <div class="card-body" style="border: 1px solid #A4A4A4;">
+                    
                 <!-- Mensagem de sucesso -->
                 <?php if ($message = $this->session->flashdata('sucesso')): ?>
                     <div class="alert  alert-success alert-dismissible fade show " role="alert">
@@ -66,14 +76,13 @@
                 <?php endif; ?>
                 <!-- Mensagem de erro -->
                 
-                <div class="card-body">
+                
                     <table class="bootstrap-data-table-export table table-striped table-bordered">
                        <thead>
                             <tr>
-                                <th class="text-center">#</th>
+                                <th class="text-center" style="display: none;">#</th>
                                 <th>Descrição</th>
                                 <th>Marca</th>
-                                <th>Fornecedor</th>
                                 <th>Categoria</th>
                                 <th>Preço</th>
                                 <th class="text-center">Est. Mín.</th>
@@ -85,10 +94,17 @@
                         <tbody>
                             <?php foreach ($produtos as $produto): ?>
                             <tr>
-                                <td class="text-center"><?php echo $produto->produto_id; ?></td>
+                                <td class="text-center" style="display: none;"><?php echo $produto->produto_id; ?></td>
                                 <td><?php echo $produto->produto_descricao; ?></td>
-                                <td><?php echo $produto->marca; ?></td>
-                                <td><?php echo $produto->fornecedor; ?></td>
+                                <td>
+                                    <?php
+                                        if ($produto->produto_marca_id == 0) {
+                                            echo '---';
+                                        } else {
+                                            echo $produto->marca;
+                                        }
+                                    ?>
+                                </td>
                                 <td><?php echo $produto->categoria; ?></td>
                                 <td><?php echo ('R$ '.$produto->produto_preco_venda); ?></td>
                                 <td class="text-center pr-4"><?php echo '<span class="badge badge-dark btn-sm">'.$produto->produto_estoque_minimo.'</span>'; ?></td>

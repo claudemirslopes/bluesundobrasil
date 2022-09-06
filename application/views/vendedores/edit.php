@@ -58,6 +58,16 @@ crossorigin="anonymous"></script>
         });
     });
     </script>
+    
+<style>
+    .form-control {
+        border: 1px solid #585858;
+    }
+    .border {
+        border: 1px solid #848484 !important;
+    }
+</style><!-- Estilo das bordas dos forms -->
+
     <!-- PARRA LATERAL - SIDEBAR -->
     <?php $this->load->view('layout/sidebar') ?>
     <!-- PARRA LATERAL - SIDEBAR -->
@@ -95,15 +105,17 @@ crossorigin="anonymous"></script>
         </div>
 
         <!-- content -->
-        <div class="content mt-3">
+        <div class="content mt-1">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-secondary text-light">
                     <strong class="card-title" v-if="headerText">Editar Vendedor</strong>
                     <span class="float-right" style="color: #777;font-size: .9em;">
                         <strong><i class="fa fa-clock-o"></i>&nbsp;&nbsp;Última alteração: </strong><?php echo formata_data_banco_com_hora($vendedor->vendedor_data_alteracao); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <a title="Voltar" href="<?php echo base_url('vendedores'); ?>" class="btn btn-success btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
+                        <a title="Voltar" href="<?php echo base_url('vendedores'); ?>" class="btn btn-light btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
                     </span>
                 </div>
+                
+                <div class="card-body" style="border: 1px solid #A4A4A4;">
                 
                 <!-- Mensagem de sucesso -->
                 <?php if ($message = $this->session->flashdata('sucesso')): ?>
@@ -129,7 +141,7 @@ crossorigin="anonymous"></script>
                 <?php endif; ?>
                 <!-- Mensagem de erro -->
                 
-                <div class="card-body">
+             
                     <form method="post" name="form_edit" class="user">
                         
                         <fieldset class="border p-2" style="margin-top: -10px;">

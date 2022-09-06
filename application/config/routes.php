@@ -50,5 +50,43 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |		my-controller/my-method	-> my_controller/my_method
 */
 $route['default_controller'] = 'home';
-$route['404_override'] = '';
+$route['404_override'] = 'custom_error_404';
 $route['translate_uri_dashes'] = FALSE;
+
+//Rota para formas de pagamento
+$route['modulo'] = 'Formas_pagamentos/index';
+$route['modulo/add'] = 'Formas_pagamentos/add';
+$route['modulo/edit/(:num)'] = 'Formas_pagamentos/edit/$1';
+$route['modulo/del/(:num)'] = 'Formas_pagamentos/del/$1';
+
+//Rota para ordem de serviços
+$route['os'] = 'Ordem_servicos/index';
+$route['os/add'] = 'Ordem_servicos/add';
+$route['os/edit/(:num)'] = 'Ordem_servicos/edit/$1';
+$route['os/del/(:num)'] = 'Ordem_servicos/del/$1';
+$route['os/imprimir/(:num)'] = 'Ordem_servicos/imprimir/$1';
+$route['os/pdf/(:num)'] = 'Ordem_servicos/pdf/$1';
+
+//Rota para relatórios de Contas a Pagar e Receber
+$route['relatorios/receber'] = 'Relatorios/receber';
+$route['relatorios/pagar'] = 'Relatorios/pagar';
+
+//Rota para avisos
+$route['avisos'] = 'Avisados/index';
+$route['avisos/add'] = 'Avisados/add';
+$route['avisos/edit/(:num)'] = 'Avisados/edit/$1';
+$route['avisos/del/(:num)'] = 'Avisados/del/$1';
+
+//Rota para Base de Conhecimento
+$route['kb'] = 'Base_conhecimento/index';
+$route['kb/add'] = 'Base_conhecimento/add';
+$route['kb/edit/(:num)'] = 'Base_conhecimento/edit/$1';
+$route['kb/del/(:num)'] = 'Base_conhecimento/del/$1';
+$route['kb/view/(:num)'] = 'Base_conhecimento/view/$1';
+
+//Rota para Base de Conhecimento - Franquias
+$route['orcamentos/kb'] = 'orcamentos/Base_conhecimento/index';
+$route['orcamentos/kb/add'] = 'orcamentos/Base_conhecimento/add';
+$route['orcamentos/kb/edit/(:num)'] = 'orcamentos/Base_conhecimento/edit/$1';
+$route['orcamentos/kb/del/(:num)'] = 'orcamentos/Base_conhecimento/del/$1';
+$route['orcamentos/kb/view/(:num)'] = 'orcamentos/Base_conhecimento/view/$1';

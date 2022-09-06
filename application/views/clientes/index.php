@@ -1,3 +1,19 @@
+<style>
+    .form-control {
+        border: 1px solid #585858;
+    }
+    .border {
+        border: 1px solid #848484 !important;
+    }
+    .btn-danger {
+        background: #B40404;
+        border: solid 1px #B40404;
+    }
+    .btn-primary {
+        background: #0B3861;
+        border: solid 1px #0B3861;
+    }
+</style>
 
     <!-- PARRA LATERAL - SIDEBAR -->
     <?php $this->load->view('layout/sidebar') ?>
@@ -35,12 +51,14 @@
         </div>
 
         <!-- content -->
-        <div class="content mt-3">
+        <div class="content mt-1">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-secondary text-light">
                     <strong class="card-title" v-if="headerText">Autorizados</strong>
-                    <a title="Cadastrar novo cliente" href="<?php echo base_url('clientes/add'); ?>" class="btn btn-success btn-sm float-right"><i class="fa fa-user-plus" aria-hidden="true"></i>&nbsp;Novo autorizado</a>
+                    <a title="Cadastrar novo cliente" href="<?php echo base_url('clientes/add'); ?>" class="btn btn-light btn-sm float-right"><i class="fa fa-user-plus" aria-hidden="true"></i>&nbsp;Novo autorizado</a>
                 </div>
+                
+                <div class="card-body" style="border: 1px solid #A4A4A4;">
                 
                 <!-- Mensagem de sucesso -->
                 <?php if ($message = $this->session->flashdata('sucesso')): ?>
@@ -66,15 +84,27 @@
                 <?php endif; ?>
                 <!-- Mensagem de erro -->
                 
-                <div class="card-body">
+                <!-- Mensagem de info -->
+                <?php if ($message = $this->session->flashdata('info')): ?>
+                    <div class="alert  alert-warning alert-dismissible fade show " role="alert">
+                        <span class="badge badge-pill badge-warning"><i class="fa fa-exclamation-circle" aria-hidden="true"></i>&nbsp;&nbsp;Advertência</span>&nbsp;&nbsp;
+                         <?php echo $message; ?>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <?php endif; ?>
+                <!-- Mensagem de info -->
+                
+               
                    <table class="bootstrap-data-table-export table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th class="text-center">#</th>
                                 <th>Nome / Razão Social</th>
                                 <th>CPF / CNPJ</th>
-                                <th>Tipo</th>
+                                <th class="text-center">Tipo</th>
                                 <th>Físico / Jurídico</th>
+                                <th class="text-center">ID</th>
                                 <th class="text-center">Ativo</th>
                                 <th class="text-right">Ações</th>
                             </tr>
@@ -82,7 +112,6 @@
                         <tbody>
                             <?php foreach ($clientes as $cliente): ?>
                             <tr>
-                                <td class="text-center"><?php echo $cliente->cliente_id ?></td>
                                 <td>
                                     <?php if ($cliente->cliente_pessoa == 1):  ?>
                                     <?php echo $cliente->cliente_nome ?>&nbsp;<?php echo $cliente->cliente_sobrenome ?>
@@ -91,12 +120,23 @@
                                     <?php endif; ?>
                                 </td>
                                 <td><?php echo $cliente->cliente_cpf_cnpj ?></td>
-                                <td>
-                                    <?php echo $cliente->cliente_tipo == 1 ? '<span class="badge badge-info btn-sm">Franqueado</span>' : '<span class="badge badge-secondary btn-sm">Integrador</span>' ?>
+                                <td class="text-center">
+                                    <?php 
+                                        if ($cliente->cliente_tipo == 1) {
+                                            echo '<span class="badge badge-info btn-sm">Franqueado</span>';
+                                        } elseif ($cliente->cliente_tipo == 2) {
+                                            echo '<span class="badge badge-secondary btn-sm">Integrador</span>';
+                                        } elseif ($cliente->cliente_tipo == 0) {
+                                            echo '<span class="badge badge-warning btn-sm">Cliente (Teste)</span>';
+                                        } else {
+                                            echo '<span class="badge badge-primary btn-sm">Distribuidor</span>';
+                                        }
+                                    ?>
                                 </td>
                                 <td>
                                     <?php echo $cliente->cliente_pessoa == 1 ? 'Pessoa Física' : 'Pessoa Jurídica' ?>
                                 </td>
+                                <td class="text-center pr-4"><?php echo $cliente->cliente_id ?></td>
                                 <td class="text-center pr-4">
                                     <?php echo $cliente->cliente_ativo == 1 ? '<span class="badge badge-success btn-sm">Sim</span>' : '<span class="badge badge-danger btn-sm">Não</span>' ?>
                                 </td>

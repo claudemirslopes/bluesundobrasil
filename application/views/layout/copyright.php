@@ -1,4 +1,5 @@
-            <div class="col-xl-12">
+        
+            <div class="col-xl-12" st>
                 <div class="card bg-light">
                     <div class="card-header text-center bg-light">
                         <span style="font-size: .8em;color: #555;">
@@ -13,7 +14,7 @@
                                         }
                                     </style>
                                     <span class="badge badge-pill badge-warning copyright">
-                                        <strong>Versão:</strong> 1.0.0.0
+                                        <strong>Versão:</strong> 1.0.0.0 (BETA)
                                     </span>
                                 </span></sup>
                         </span>                        

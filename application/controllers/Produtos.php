@@ -15,6 +15,7 @@ class Produtos extends CI_Controller{
         
         //Carrega o model diretamente no controller ao invés do autoload
         $this->load->model('produtos_model');
+        $this->load->model('home_model');
         
     }
     
@@ -32,19 +33,90 @@ class Produtos extends CI_Controller{
             'scripts' => array(
               'vendors/datatables.net/js/jquery.dataTables.min.js', 
               'vendors/datatables.net-bs4/js/dataTables.bootstrap4.min.js',
+              
+              'vendors/datatables.net/export/dataTables.buttons.min.js',
+              'vendors/datatables.net/export/pdfmake.min.js',
+              'vendors/datatables.net/export/vfs_fonts.js',
+              'vendors/datatables.net/export/buttons.html5.min.js',
+                
               'vendors/datatables.net-bs4/js/app.js',
               'vendors/datatables.net-buttons/js/dataTables.buttons.min.js',
               'vendors/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js',
               'vendors/datatables.net-buttons/js/buttons.html5.min.js',
               'vendors/datatables.net-buttons/js/buttons.print.min.js',
               'vendors/datatables.net-buttons/js/buttons.colVis.min.js',
-              'assets/js/init-scripts/data-table/datatables-init.js',  
+              'assets/js/init-scripts/data-table/datatables-init.js',       
             ),
+            
+            
             
             //Usa o model de produtos para dar JOIN nas tabelas
             'produtos' => $this->produtos_model->get_all(),
             
+            // Home
+            'soma_vendas' => $this->home_model->get_sum_vendas(),
+            'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+            'soma_receber' => $this->home_model->get_sum_receber(),
+            'soma_pagar' => $this->home_model->get_sum_pagar(),
+            'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+            'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+            'top_servicos' => $this->home_model->get_servicos_mais_vendidos(),
+            
         );
+        
+        //CENTRAL DE NOTIFICAÇÕES
+        $contador_notificacoes = 0;
+        if ($this->home_model->get_contas_receber_vencidas()) {
+            
+            $data['contas_receber_vencidas'] = TRUE;
+            $contador_notificacoes ++;
+        } 
+//        else {
+//            $data['contas_receber_vencidas'] = FALSE;
+//        }
+        if ($this->home_model->get_contas_pagar_vencidas()) {
+            
+            $data['contas_pagar_vencidas'] = TRUE;
+            $contador_notificacoes ++;
+        } 
+//        else {
+//            $data['contas_pagar_vencidas'] = FALSE;
+//        }
+        if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+            
+            $data['contas_pagar_vence_hoje'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_contas_receber_vencem_hoje()) {
+            
+            $data['contas_receber_vence_hoje'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_usuarios_desativados()) {
+            
+            $data['usuarios_desativados'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_produtos_sem_estoque()) {
+            
+            $data['produto_sem_estoque'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_reclamacoes_pendentes()) {
+            
+            $data['reclama_pendente'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->ion_auth->is_admin()) {
+           if ($this->home_model->get_tickets_pendentes()) {
+            
+                $data['ticket_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+        }
+        
+        
+        $data['contador_notificacoes'] = $contador_notificacoes;
         
 //        echo '<pre>';
 //        print_r($data['produtos']);
@@ -67,6 +139,7 @@ class Produtos extends CI_Controller{
         $this->form_validation->set_rules('produto_preco_venda', 'preço de venda', 'trim|required|max_length[45]|callback_check_produto_preco_venda');
         $this->form_validation->set_rules('produto_estoque_minimo', 'estoque mínimo', 'trim|required|greater_than_equal_to[1]');
         $this->form_validation->set_rules('produto_qtde_estoque', 'quantidade estoque', 'trim|required');
+        $this->form_validation->set_rules('produto_eficiência', 'eficiência', 'min_length[1]');
         $this->form_validation->set_rules('produto_obs', 'observação', 'trim|max_length[500]');
             
            
@@ -87,6 +160,9 @@ class Produtos extends CI_Controller{
                         'produto_preco_venda',
                         'produto_estoque_minimo',
                         'produto_qtde_estoque',
+                        'produto_potencia',
+                        'produto_eficiencia',
+                        'produto_codigo_interno',
                         'produto_ativo',
                         'produto_obs',
                     ), $this->input->post()
@@ -114,13 +190,77 @@ class Produtos extends CI_Controller{
                     'vendors/mask/app.js',
                 ),
                     
+                // Home
+                'soma_vendas' => $this->home_model->get_sum_vendas(),
+                'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+                'soma_receber' => $this->home_model->get_sum_receber(),
+                'soma_pagar' => $this->home_model->get_sum_pagar(),
+                'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+                'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+                'top_servicos' => $this->home_model->get_servicos_mais_vendidos(), 
+                    
                 'produto_codigo' => $this->core_model->generate_unique_code('produtos', 'numeric', 8, 'produto_codigo'),
+                'produto_codigo_interno' => $this->core_model->generate_unique_code('produtos', 'numeric', 8, 'produto_codigo_interno'),
                 
                 'marcas' => $this->core_model->get_all('marcas', array('marca_ativa' => 1)),
                 'fornecedores' => $this->core_model->get_all('fornecedores', array('fornecedor_ativo' => 1)),
                 'categorias' => $this->core_model->get_all('categorias', array('categoria_ativa' => 1)),
 
             );
+                
+            //CENTRAL DE NOTIFICAÇÕES
+            $contador_notificacoes = 0;
+            if ($this->home_model->get_contas_receber_vencidas()) {
+
+                $data['contas_receber_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_receber_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencidas()) {
+
+                $data['contas_pagar_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_pagar_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+
+                $data['contas_pagar_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_contas_receber_vencem_hoje()) {
+
+                $data['contas_receber_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_usuarios_desativados()) {
+
+                $data['usuarios_desativados'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_produtos_sem_estoque()) {
+
+                $data['produto_sem_estoque'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_reclamacoes_pendentes()) {
+
+                $data['reclama_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->ion_auth->is_admin()) {
+               if ($this->home_model->get_tickets_pendentes()) {
+
+                    $data['ticket_pendente'] = TRUE;
+                    $contador_notificacoes ++;
+                } 
+            }
+
+
+            $data['contador_notificacoes'] = $contador_notificacoes;
             
             // Carrega a view de editar produtos
             $this->load->view('layout/header', $data);
@@ -145,6 +285,9 @@ class Produtos extends CI_Controller{
             $this->form_validation->set_rules('produto_preco_venda', 'preço de venda', 'trim|required|max_length[45]|callback_check_produto_preco_venda');
             $this->form_validation->set_rules('produto_estoque_minimo', 'estoque mínimo', 'trim|required|greater_than_equal_to[1]');
             $this->form_validation->set_rules('produto_qtde_estoque', 'quantidade estoque', 'trim|required');
+            $this->form_validation->set_rules('produto_potencia', 'potência', 'trim');
+            $this->form_validation->set_rules('produto_eficiência', 'eficiência', 'min_length[1]');
+            $this->form_validation->set_rules('produto_codigo_interno', 'código interno', 'trim|required');
             $this->form_validation->set_rules('produto_obs', 'observação', 'trim|max_length[500]');
             
            
@@ -165,6 +308,9 @@ class Produtos extends CI_Controller{
                         'produto_preco_venda',
                         'produto_estoque_minimo',
                         'produto_qtde_estoque',
+                        'produto_potencia',
+                        'produto_eficiencia',
+                        'produto_codigo_interno',
                         'produto_ativo',
                         'produto_obs',
                     ), $this->input->post()
@@ -194,14 +340,77 @@ class Produtos extends CI_Controller{
                     'vendors/mask/jquery.mask.min.js',
                     'vendors/mask/app.js',
                 ),
+                    
+                // Home
+                'soma_vendas' => $this->home_model->get_sum_vendas(),
+                'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+                'soma_receber' => $this->home_model->get_sum_receber(),
+                'soma_pagar' => $this->home_model->get_sum_pagar(),
+                'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+                'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+                'top_servicos' => $this->home_model->get_servicos_mais_vendidos(), 
 
                 'produto' => $this->core_model->get_by_id('produtos', array('produto_id' => $produto_id)),
                 
                 'marcas' => $this->core_model->get_all('marcas', array('marca_ativa' => 1)),
                 'fornecedores' => $this->core_model->get_all('fornecedores', array('fornecedor_ativo' => 1)),
                 'categorias' => $this->core_model->get_all('categorias', array('categoria_ativa' => 1)),
-
+                
             );
+                
+            //CENTRAL DE NOTIFICAÇÕES
+            $contador_notificacoes = 0;
+            if ($this->home_model->get_contas_receber_vencidas()) {
+
+                $data['contas_receber_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_receber_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencidas()) {
+
+                $data['contas_pagar_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_pagar_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+
+                $data['contas_pagar_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_contas_receber_vencem_hoje()) {
+
+                $data['contas_receber_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_usuarios_desativados()) {
+
+                $data['usuarios_desativados'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_produtos_sem_estoque()) {
+
+                $data['produto_sem_estoque'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_reclamacoes_pendentes()) {
+
+                $data['reclama_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->ion_auth->is_admin()) {
+               if ($this->home_model->get_tickets_pendentes()) {
+
+                    $data['ticket_pendente'] = TRUE;
+                    $contador_notificacoes ++;
+                } 
+            }
+
+
+            $data['contador_notificacoes'] = $contador_notificacoes;
             
             // Carrega a view de editar produtos
             $this->load->view('layout/header', $data);

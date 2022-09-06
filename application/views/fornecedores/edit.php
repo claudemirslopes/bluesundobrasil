@@ -1,3 +1,4 @@
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"
 integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
 crossorigin="anonymous"></script>
@@ -6,7 +7,7 @@ crossorigin="anonymous"></script>
     $(document).ready(function() {
         function limpa_formulário_cep() {
             // Limpa valores do formulário de cep.
-            $("#rua").val("");
+            $("#logradouro").val("");
             $("#bairro").val("");
             $("#cidade").val("");
             $("#uf").val("");
@@ -23,7 +24,7 @@ crossorigin="anonymous"></script>
                 //Valida o formato do CEP.
                 if(validacep.test(cep)) {
                     //Preenche os campos com "carregando..." enquanto consulta webservice.
-                    $("#rua").val("carregando...");
+                    $("#logradouro").val("carregando...");
                     $("#bairro").val("carregando...");
                     $("#cidade").val("carregando...");
                     $("#uf").val("carregando...");
@@ -32,7 +33,7 @@ crossorigin="anonymous"></script>
                     $.getJSON("https://viacep.com.br/ws/"+ cep +"/json/?callback=?", function(dados) {
                         if (!("erro" in dados)) {
                             //Atualiza os campos com os valores da consulta.
-                            $("#rua").val(dados.logradouro);
+                            $("#logradouro").val(dados.logradouro);
                             $("#bairro").val(dados.bairro);
                             $("#cidade").val(dados.localidade);
                             $("#uf").val(dados.uf);
@@ -58,6 +59,16 @@ crossorigin="anonymous"></script>
         });
     });
     </script>
+    
+<style>
+    .form-control {
+        border: 1px solid #585858;
+    }
+    .border {
+        border: 1px solid #848484 !important;
+    }
+</style>
+
     <!-- PARRA LATERAL - SIDEBAR -->
     <?php $this->load->view('layout/sidebar') ?>
     <!-- PARRA LATERAL - SIDEBAR -->
@@ -95,15 +106,17 @@ crossorigin="anonymous"></script>
         </div>
 
         <!-- content -->
-        <div class="content mt-3">
+        <div class="content mt-1">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-secondary text-light">
                     <strong class="card-title" v-if="headerText">Editar Fornecedor</strong>
                     <span class="float-right" style="color: #777;font-size: .9em;">
                         <strong><i class="fa fa-clock-o"></i>&nbsp;&nbsp;Última alteração: </strong><?php echo formata_data_banco_com_hora($fornecedor->fornecedor_data_alteracao); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <a title="Voltar" href="<?php echo base_url('fornecedores'); ?>" class="btn btn-success btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
+                        <a title="Voltar" href="<?php echo base_url('fornecedores'); ?>" class="btn btn-light btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
                     </span>
                 </div>
+                
+                <div class="card-body" style="border: 1px solid #A4A4A4;">
                 
                 <!-- Mensagem de sucesso -->
                 <?php if ($message = $this->session->flashdata('sucesso')): ?>
@@ -129,15 +142,15 @@ crossorigin="anonymous"></script>
                 <?php endif; ?>
                 <!-- Mensagem de erro -->
                 
-                <div class="card-body">
-                    <form method="post" name="form_edit" class="user">
+               
+                    <form method="post" name="form_edit" class="user" id="post">
                         
                         <fieldset class="border p-2" style="margin-top: -10px;">
                             <legend class="font-small"><i class="fa fa-cogs"></i> Configurações</legend>
                             <div class="form-row">
                                 <div class="form-group col-md-5">
                                     <label for="fornecedor_cnpj">CNPJ <span style="color: red;font-weight: bold;">*</span></label>
-                                    <input type="text" name="fornecedor_cnpj" class="form-control form-control-user cnpjmask" id="fornecedor_cnpj" placeholder="CNPJ" value="<?php echo $fornecedor->fornecedor_cnpj; ?>">
+                                    <input type="text" name="fornecedor_cnpj" class="form-control form-control-user cnpjmask" id="cnpj" placeholder="CNPJ" value="<?php echo $fornecedor->fornecedor_cnpj; ?>">
                                     <?php echo form_error('fornecedor_cnpj', '<small class="form-text text-danger">','</small>') ?>                              
                                 </div>
                                 <div class="form-group col-md-5">
@@ -160,12 +173,12 @@ crossorigin="anonymous"></script>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="fornecedor_razao">Razão Social <span style="color: red;font-weight: bold;">*</span></label> 
-                                    <input type="text" name="fornecedor_razao" class="form-control form-control-user" id="fornecedor_razao" placeholder="Razão Social" value="<?php echo $fornecedor->fornecedor_razao; ?>">
+                                    <input type="text" name="fornecedor_razao" class="form-control form-control-user" id="nome" placeholder="Razão Social" value="<?php echo $fornecedor->fornecedor_razao; ?>">
                                     <?php echo form_error('fornecedor_razao', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="fornecedor_nome_fantasia">Nome Fantasia <span style="color: red;font-weight: bold;">*</span></label>
-                                    <input type="text" name="fornecedor_nome_fantasia" class="form-control form-control-user" id="fornecedor_nome_fantasia" placeholder="Nome Fantasia" value="<?php echo $fornecedor->fornecedor_nome_fantasia; ?>">
+                                    <input type="text" name="fornecedor_nome_fantasia" class="form-control form-control-user" id="fantasia" placeholder="Nome Fantasia" value="<?php echo $fornecedor->fornecedor_nome_fantasia; ?>">
                                     <?php echo form_error('fornecedor_nome_fantasia', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                             </div>
@@ -173,7 +186,7 @@ crossorigin="anonymous"></script>
                             <div class="form-row">
                                 <div class="form-group col-md-3">
                                     <label for="fornecedor_email">E-mail <span style="color: red;font-weight: bold;">*</span></label>
-                                    <input type="email" name="fornecedor_email" class="form-control form-control-user" id="fornecedor_email" placeholder="E-mail" value="<?php echo $fornecedor->fornecedor_email; ?>">
+                                    <input type="email" name="fornecedor_email" class="form-control form-control-user" id="email" placeholder="E-mail" value="<?php echo $fornecedor->fornecedor_email; ?>">
                                     <?php echo form_error('fornecedor_email', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                                 <div class="form-group col-md-3">
@@ -183,7 +196,7 @@ crossorigin="anonymous"></script>
                                 </div>
                                 <div class="form-group col-md-3">
                                     <label for="fornecedor_telefone">Telefone Fixo <span style="color: red;font-weight: bold;">*</span></label>
-                                    <input type="text" name="fornecedor_telefone" class="form-control form-control-user telefone" id="fornecedor_telefone" placeholder="Telefone Fixo" value="<?php echo $fornecedor->fornecedor_telefone; ?>">
+                                    <input type="text" name="fornecedor_telefone" class="form-control form-control-user telefone" id="telefone" placeholder="Telefone Fixo" value="<?php echo $fornecedor->fornecedor_telefone; ?>">
                                     <?php echo form_error('fornecedor_telefone', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                                 <div class="form-group col-md-3">
@@ -204,7 +217,7 @@ crossorigin="anonymous"></script>
                                 </div>
                                 <div class="form-group col-md-9">
                                     <label for="fornecedor_endereco">Endereço <span style="color: red;font-weight: bold;">*</span></label>
-                                    <input type="text" name="fornecedor_endereco" class="form-control form-control-user" id="rua" placeholder="Logradouro, rua, etc..." value="<?php echo $fornecedor->fornecedor_endereco; ?>">
+                                    <input type="text" name="fornecedor_endereco" class="form-control form-control-user" id="logradouro" placeholder="Logradouro, rua, etc..." value="<?php echo $fornecedor->fornecedor_endereco; ?>">
                                     <?php echo form_error('fornecedor_endereco', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                                 <div class="form-group col-md-1">
@@ -285,3 +298,43 @@ crossorigin="anonymous"></script>
             </div>
 
         </div>
+<script type="text/javascript">
+$("#cnpj").focusout(function(){
+        //Início do Comando AJAX
+        $.ajax({
+            //O campo URL diz o caminho de onde virá os dados
+            //É importante concatenar o valor digitado no CNPJ
+            url: 'http://localhost/BluesunPlataforma/dados/cnpj.php?cnpj='+$("#cnpj").val(),
+            //Atualização: caso use java, use cnpj.jsp, usando o outro exemplo.
+            //Aqui você deve preencher o tipo de dados que será lido,
+            //no caso, estamos lendo JSON.
+            dataType: 'json',
+            //SUCESS é referente a função que será executada caso
+            //ele consiga ler a fonte de dados com sucesso.
+            //O parâmetro dentro da função se refere ao nome da variável
+            //que você vai dar para ler esse objeto.
+            success: function(resposta){
+                    //Confere se houve erro e o imprime
+                    if(resposta.status == "ERROR"){
+                            alert(resposta.message + "\nPor favor, digite os dados manualmente.");
+                            $("#post #nome").focus().select();
+                            return false;
+                    }
+                    //Agora basta definir os valores que você deseja preencher
+                    //automaticamente nos campos acima.
+                    $("#post #nome").val(resposta.nome);
+                    $("#post #fantasia").val(resposta.fantasia);
+                    $("#post #atividade").val(resposta.atividade_principal[0].text + " (" + resposta.atividade_principal[0].code + ")");
+                    $("#post #telefone").val(resposta.telefone);
+                    $("#post #email").val(resposta.email);
+                    $("#post #logradouro").val(resposta.logradouro);
+                    $("#post #complemento").val(resposta.complemento);
+                    $("#post #bairro").val(resposta.bairro);
+                    $("#post #cidade").val(resposta.municipio);
+                    $("#post #uf").val(resposta.uf);
+                    $("#post #cep").val(resposta.cep);
+                    $("#post #numero").val(resposta.numero);
+                }
+            });
+});
+</script>

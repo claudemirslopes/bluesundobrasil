@@ -1,4 +1,13 @@
-    <!-- PARRA LATERAL - SIDEBAR -->
+<style>
+    .form-control {
+        border: 1px solid #585858;
+    }
+    .border {
+        border: 1px solid #848484 !important;
+    }
+</style>
+
+<!-- PARRA LATERAL - SIDEBAR -->
     <?php $this->load->view('layout/sidebar') ?>
     <!-- PARRA LATERAL - SIDEBAR -->
 
@@ -34,15 +43,17 @@
         </div>
 
         <!-- content -->
-        <div class="content mt-3">
+        <div class="content mt-1">
             <div class="card">
-                <div class="card-header">
-                    <strong class="card-title" v-if="headerText">Cadatrar Conta a Pagar</strong>
+                <div class="card-header bg-secondary text-light">
+                    <strong class="card-title" v-if="headerText">Cadastrar Conta a Pagar</strong>
                     <span class="float-right" style="color: #777;font-size: .9em;">
-                        <a title="Voltar" href="<?php echo base_url('contas_pagar'); ?>" class="btn btn-success btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
+                        <a title="Voltar" href="<?php echo base_url('contas_pagar'); ?>" class="btn btn-light btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
                     </span>
                 </div>
                 
+                <div class="card-body" style="border: 1px solid #A4A4A4;">
+                    
                 <!-- Mensagem de sucesso -->
                 <?php if ($message = $this->session->flashdata('sucesso')): ?>
                     <div class="alert  alert-success alert-dismissible fade show " role="alert">
@@ -67,7 +78,7 @@
                 <?php endif; ?>
                 <!-- Mensagem de erro -->
                 
-                <div class="card-body">
+                
                     <form method="post" name="form_edit" class="user">
                         
                         <fieldset class="border p-2" style="margin-top: -10px;">
@@ -84,7 +95,7 @@
                                 </div>
                                 <div class="form-group col-md-2">
                                     <label for="conta_pagar_valor">Valor <span style="color: red;font-weight: bold;">*</span></label>
-                                    <input type="text" name="conta_pagar_valor" class="form-control form-control-user money" id="conta_pagar_valor" placeholder="Ex: 99,99" value="<?php echo set_value('conta_pagar_valor'); ?>">
+                                    <input type="text" name="conta_pagar_valor" class="form-control form-control-user money2" id="conta_pagar_valor" placeholder="Ex: 99,99" value="<?php echo set_value('conta_pagar_valor'); ?>">
                                     <?php echo form_error('conta_pagar_valor', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                                 <div class="form-group col-md-3">
@@ -118,7 +129,7 @@
                             </div>
                         </fieldset>
                         
-                        <button type="submit" class="btn btn-primary btn-sm float-right mt-1"><i class="fa fa-plus" aria-hidden="true"></i> Cadatrar conta a pagar</button>
+                        <button type="submit" class="btn btn-primary btn-sm float-right mt-1"><i class="fa fa-plus" aria-hidden="true"></i> Cadastrar conta a pagar</button>
                         
                     </form>
                 </div>

@@ -9,18 +9,13 @@
 
     <!-- BARRA DIREITA --> 
     
-<!--    <script src="https://kit.fontawesome.com/a8568f4b07.js" crossorigin="anonymous"></script>-->
-    <script src="<?php echo base_url('public/vendors/jquery/dist/jquery.min.js'); ?>"></script>
+    <script src="https://kit.fontawesome.com/a8568f4b07.js" crossorigin="anonymous"></script>
+    <!--<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>-->
+    <script src="<?php echo base_url('public/vendors/jquery/dist/jquery-3.0.0.min.js'); ?>"></script>
     <script src="<?php echo base_url('public/vendors/popper.js/dist/umd/popper.min.js'); ?>"></script>
     <script src="<?php echo base_url('public/vendors/bootstrap/dist/js/bootstrap.min.js'); ?>"></script>
-    <script src="<?php echo base_url('public/assets/js/main.js'); ?>"></script>
-<!--    <script src="<?php echo base_url('public/vendors/chart.js/dist/Chart.bundle.min.js'); ?>"></script>
-    <script src="<?php echo base_url('public/assets/js/dashboard.js'); ?>"></script>
-    <script src="<?php echo base_url('public/assets/js/widgets.js'); ?>"></script>
-    <script src="<?php echo base_url('public/vendors/jqvmap/dist/jquery.vmap.min.js'); ?>"></script>
-    <script src="<?php echo base_url('public/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js'); ?>"></script>
-    <script src="<?php echo base_url('public/vendors/jqvmap/dist/maps/jquery.vmap.world.js'); ?>"></script>-->
     <script src="<?php echo base_url('public/assets/js/util.js'); ?>"></script>
+    <script src="<?php echo base_url('public/assets/js/main.js'); ?>"></script>
     
     <?php if (isset($scripts)): ?>
     

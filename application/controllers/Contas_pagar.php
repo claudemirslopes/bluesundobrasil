@@ -13,7 +13,15 @@ class Contas_pagar extends CI_Controller{
             redirect('login');
         }
         
+        # multiple groups (by name)
+        $group = array(1, 3);
+        if (!$this->ion_auth->in_group($group)) {
+          $this->session->set_flashdata('info', 'Você não tem permissão para acessar o módulo <b>Financeiro</b>');
+          redirect('home');
+        }
+        
         $this->load->model('financeiro_model');
+        $this->load->model('home_model');
         
     }
     
@@ -40,9 +48,72 @@ class Contas_pagar extends CI_Controller{
               'assets/js/init-scripts/data-table/datatables-init.js',  
             ),
             
+            // Home
+            'soma_vendas' => $this->home_model->get_sum_vendas(),
+            'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+            'soma_receber' => $this->home_model->get_sum_receber(),
+            'soma_pagar' => $this->home_model->get_sum_pagar(),
+            'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+            'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+            'top_servicos' => $this->home_model->get_servicos_mais_vendidos(), 
+            
             'contas_pagar' => $this->financeiro_model->get_all_pagar(),
             
         );
+        
+        //CENTRAL DE NOTIFICAÇÕES
+        $contador_notificacoes = 0;
+        if ($this->home_model->get_contas_receber_vencidas()) {
+            
+            $data['contas_receber_vencidas'] = TRUE;
+            $contador_notificacoes ++;
+        } 
+//        else {
+//            $data['contas_receber_vencidas'] = FALSE;
+//        }
+        if ($this->home_model->get_contas_pagar_vencidas()) {
+            
+            $data['contas_pagar_vencidas'] = TRUE;
+            $contador_notificacoes ++;
+        } 
+//        else {
+//            $data['contas_pagar_vencidas'] = FALSE;
+//        }
+        if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+            
+            $data['contas_pagar_vence_hoje'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_contas_receber_vencem_hoje()) {
+            
+            $data['contas_receber_vence_hoje'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_usuarios_desativados()) {
+            
+            $data['usuarios_desativados'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_produtos_sem_estoque()) {
+            
+            $data['produto_sem_estoque'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_reclamacoes_pendentes()) {
+            
+            $data['reclama_pendente'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->ion_auth->is_admin()) {
+           if ($this->home_model->get_tickets_pendentes()) {
+            
+                $data['ticket_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+        }
+        
+        
+        $data['contador_notificacoes'] = $contador_notificacoes;
         
 //        echo '<pre>';
 //        print_r($data['contas_pagar']);
@@ -100,23 +171,91 @@ class Contas_pagar extends CI_Controller{
             
             $data = array(
             
-                'titulo' => 'Cadatrar Conta a Pagar',
+                'titulo' => 'Cadastrar Conta a Pagar',
                 
-                'styles' => array (
+                'styles' => array(
                     'vendors/select2/select2.min.css',
+                    'vendors/autocomplete/jquery-ui.css',
+                    'vendors/autocomplete/estilos.css',
                 ),
 
                 'scripts' => array (
+                    'vendors/autocomplete/jquery-migrate.js', //Nesta ordem
+                    'vendors/calcx/jquery-calx-sample-2.2.8.min.js',
+                    'vendors/calcx/os.js',
                     'vendors/select2/select2.min.js',
                     'vendors/select2/app.js',
-                    'vendors/mask/jquery_3.2.1.min.js',
+                    'vendors/autocomplete/jquery-ui.js',
                     'vendors/mask/jquery.mask.min.js',
                     'vendors/mask/app.js',
                 ),
+                
+                // Home
+                'soma_vendas' => $this->home_model->get_sum_vendas(),
+                'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+                'soma_receber' => $this->home_model->get_sum_receber(),
+                'soma_pagar' => $this->home_model->get_sum_pagar(),
+                'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+                'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+                'top_servicos' => $this->home_model->get_servicos_mais_vendidos(), 
 
-                'fornecedores' => $this->core_model->get_all('fornecedores'),
+                'fornecedores' => $this->core_model->get_all('fornecedores', array('fornecedor_ativo' => 1)),
 
             );
+            
+            //CENTRAL DE NOTIFICAÇÕES
+            $contador_notificacoes = 0;
+            if ($this->home_model->get_contas_receber_vencidas()) {
+
+                $data['contas_receber_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_receber_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencidas()) {
+
+                $data['contas_pagar_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_pagar_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+
+                $data['contas_pagar_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_contas_receber_vencem_hoje()) {
+
+                $data['contas_receber_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_usuarios_desativados()) {
+
+                $data['usuarios_desativados'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_produtos_sem_estoque()) {
+
+                $data['produto_sem_estoque'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_reclamacoes_pendentes()) {
+
+                $data['reclama_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->ion_auth->is_admin()) {
+               if ($this->home_model->get_tickets_pendentes()) {
+
+                    $data['ticket_pendente'] = TRUE;
+                    $contador_notificacoes ++;
+                } 
+            }
+
+
+            $data['contador_notificacoes'] = $contador_notificacoes;    
 
                 // Carrega a view de editar contas_pagar
                $this->load->view('layout/header', $data);
@@ -179,22 +318,90 @@ class Contas_pagar extends CI_Controller{
             
                 'titulo' => 'Atualizar Conta a Pagar',
                 
-                'styles' => array (
+                'styles' => array(
                     'vendors/select2/select2.min.css',
+                    'vendors/autocomplete/jquery-ui.css',
+                    'vendors/autocomplete/estilos.css',
                 ),
 
                 'scripts' => array (
+                    'vendors/autocomplete/jquery-migrate.js', //Nesta ordem
+                    'vendors/calcx/jquery-calx-sample-2.2.8.min.js',
+                    'vendors/calcx/os.js',
                     'vendors/select2/select2.min.js',
                     'vendors/select2/app.js',
-                    'vendors/mask/jquery_3.2.1.min.js',
+                    'vendors/autocomplete/jquery-ui.js',
                     'vendors/mask/jquery.mask.min.js',
                     'vendors/mask/app.js',
                 ),
+                
+                // Home
+                'soma_vendas' => $this->home_model->get_sum_vendas(),
+                'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+                'soma_receber' => $this->home_model->get_sum_receber(),
+                'soma_pagar' => $this->home_model->get_sum_pagar(),
+                'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+                'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+                'top_servicos' => $this->home_model->get_servicos_mais_vendidos(), 
 
                 'conta_pagar' => $this->core_model->get_by_id('contas_pagar', array('conta_pagar_id' => $conta_pagar_id)),
                 'fornecedores' => $this->core_model->get_all('fornecedores'),
 
             );
+            
+            //CENTRAL DE NOTIFICAÇÕES
+            $contador_notificacoes = 0;
+            if ($this->home_model->get_contas_receber_vencidas()) {
+
+                $data['contas_receber_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_receber_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencidas()) {
+
+                $data['contas_pagar_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_pagar_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+
+                $data['contas_pagar_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_contas_receber_vencem_hoje()) {
+
+                $data['contas_receber_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_usuarios_desativados()) {
+
+                $data['usuarios_desativados'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_produtos_sem_estoque()) {
+
+                $data['produto_sem_estoque'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_reclamacoes_pendentes()) {
+
+                $data['reclama_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->ion_auth->is_admin()) {
+               if ($this->home_model->get_tickets_pendentes()) {
+
+                    $data['ticket_pendente'] = TRUE;
+                    $contador_notificacoes ++;
+                } 
+            }
+
+
+            $data['contador_notificacoes'] = $contador_notificacoes;
 
                 // Carrega a view de editar contas_pagar
                $this->load->view('layout/header', $data);

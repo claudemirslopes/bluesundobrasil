@@ -22,8 +22,18 @@ defined('BASEPATH') OR exit('Ação não permitida');
             $this->db->join('marcas', 'marca_id = produto_marca_id', 'LEFT');
             $this->db->join('fornecedores', 'fornecedor_id = produto_fornecedor_id', 'LEFT');
             
+            $this->db->order_by('produtos.produto_descricao', 'ASC');
+            
             //Retorna todos os resultados na tabela produtos,
             return $this->db->get('produtos')->result();
+            
+        }
+        
+        public function update($produto_id, $diferenca) {
+            
+            $this->db->set('produto_qtde_estoque', 'produto_qtde_estoque - '.$diferenca, FALSE);
+            $this->db->where('produto_id', $produto_id);
+            $this->db->update('produtos');
             
         }
     }

@@ -13,6 +13,8 @@ class Servicos extends CI_Controller{
             redirect('login');
         }
         
+        $this->load->model('home_model');
+        
     }
     
     public function index() {
@@ -38,9 +40,72 @@ class Servicos extends CI_Controller{
               'assets/js/init-scripts/data-table/datatables-init.js',  
             ),
             
+            // Home
+            'soma_vendas' => $this->home_model->get_sum_vendas(),
+            'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+            'soma_receber' => $this->home_model->get_sum_receber(),
+            'soma_pagar' => $this->home_model->get_sum_pagar(),
+            'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+            'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+            'top_servicos' => $this->home_model->get_servicos_mais_vendidos(), 
+            
             'servicos' => $this->core_model->get_all('servicos'),
             
         );
+        
+        //CENTRAL DE NOTIFICAÇÕES
+        $contador_notificacoes = 0;
+        if ($this->home_model->get_contas_receber_vencidas()) {
+            
+            $data['contas_receber_vencidas'] = TRUE;
+            $contador_notificacoes ++;
+        } 
+//        else {
+//            $data['contas_receber_vencidas'] = FALSE;
+//        }
+        if ($this->home_model->get_contas_pagar_vencidas()) {
+            
+            $data['contas_pagar_vencidas'] = TRUE;
+            $contador_notificacoes ++;
+        } 
+//        else {
+//            $data['contas_pagar_vencidas'] = FALSE;
+//        }
+        if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+            
+            $data['contas_pagar_vence_hoje'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_contas_receber_vencem_hoje()) {
+            
+            $data['contas_receber_vence_hoje'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_usuarios_desativados()) {
+            
+            $data['usuarios_desativados'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_produtos_sem_estoque()) {
+            
+            $data['produto_sem_estoque'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_reclamacoes_pendentes()) {
+            
+            $data['reclama_pendente'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->ion_auth->is_admin()) {
+           if ($this->home_model->get_tickets_pendentes()) {
+            
+                $data['ticket_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+        }
+        
+        
+        $data['contador_notificacoes'] = $contador_notificacoes;
         
 //        echo '<pre>';
 //        print_r($data['servicos']);
@@ -97,7 +162,70 @@ class Servicos extends CI_Controller{
                 'vendors/mask/app.js',
             ),
                 
+            // Home
+            'soma_vendas' => $this->home_model->get_sum_vendas(),
+            'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+            'soma_receber' => $this->home_model->get_sum_receber(),
+            'soma_pagar' => $this->home_model->get_sum_pagar(),
+            'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+            'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+            'top_servicos' => $this->home_model->get_servicos_mais_vendidos(), 
+                
         );
+            
+        //CENTRAL DE NOTIFICAÇÕES
+        $contador_notificacoes = 0;
+        if ($this->home_model->get_contas_receber_vencidas()) {
+            
+            $data['contas_receber_vencidas'] = TRUE;
+            $contador_notificacoes ++;
+        } 
+//        else {
+//            $data['contas_receber_vencidas'] = FALSE;
+//        }
+        if ($this->home_model->get_contas_pagar_vencidas()) {
+            
+            $data['contas_pagar_vencidas'] = TRUE;
+            $contador_notificacoes ++;
+        } 
+//        else {
+//            $data['contas_pagar_vencidas'] = FALSE;
+//        }
+        if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+            
+            $data['contas_pagar_vence_hoje'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_contas_receber_vencem_hoje()) {
+            
+            $data['contas_receber_vence_hoje'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_usuarios_desativados()) {
+            
+            $data['usuarios_desativados'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_produtos_sem_estoque()) {
+            
+            $data['produto_sem_estoque'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_reclamacoes_pendentes()) {
+            
+            $data['reclama_pendente'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->ion_auth->is_admin()) {
+           if ($this->home_model->get_tickets_pendentes()) {
+            
+                $data['ticket_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+        }
+        
+        
+        $data['contador_notificacoes'] = $contador_notificacoes;
 
 //                echo '<pre>';
 //                print_r($data['servico']);
@@ -161,10 +289,73 @@ class Servicos extends CI_Controller{
                     'vendors/mask/jquery.mask.min.js',
                     'vendors/mask/app.js',
                 ),
+                    
+                // Home
+                'soma_vendas' => $this->home_model->get_sum_vendas(),
+                'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+                'soma_receber' => $this->home_model->get_sum_receber(),
+                'soma_pagar' => $this->home_model->get_sum_pagar(),
+                'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+                'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+                'top_servicos' => $this->home_model->get_servicos_mais_vendidos(), 
 
                 'servico' => $this->core_model->get_by_id('servicos', array('servico_id' => $servico_id)),
 
             );
+                
+            //CENTRAL DE NOTIFICAÇÕES
+            $contador_notificacoes = 0;
+            if ($this->home_model->get_contas_receber_vencidas()) {
+
+                $data['contas_receber_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_receber_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencidas()) {
+
+                $data['contas_pagar_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_pagar_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+
+                $data['contas_pagar_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_contas_receber_vencem_hoje()) {
+
+                $data['contas_receber_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_usuarios_desativados()) {
+
+                $data['usuarios_desativados'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_produtos_sem_estoque()) {
+
+                $data['produto_sem_estoque'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_reclamacoes_pendentes()) {
+
+                $data['reclama_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->ion_auth->is_admin()) {
+               if ($this->home_model->get_tickets_pendentes()) {
+
+                    $data['ticket_pendente'] = TRUE;
+                    $contador_notificacoes ++;
+                } 
+            }
+
+
+            $data['contador_notificacoes'] = $contador_notificacoes;
                 
 //                echo '<pre>';
 //                print_r($data['servico']);
@@ -185,12 +376,16 @@ class Servicos extends CI_Controller{
     public function del($servico_id = NULL) {
 
         if (!$servico_id || !$this->core_model->get_by_id('servicos', array('servico_id' => $servico_id))) {
-            $this->session->set_flashdata('error', 'O servico não foi encontrado');
+            $this->session->set_flashdata('error', 'O serviço não foi encontrada');
             redirect('servicos');
-        } else {
+        } 
+        if ($this->core_model->get_by_id('servicos', array('servico_id' => $servico_id, 'servico_ativo' => 1))) {
+            $this->session->set_flashdata('info', 'Este serviço não pode ser excluído, pois ainda está ativo');
+            redirect('servicos');
+        } 
+        
             $this->core_model->delete('servicos', array('servico_id' => $servico_id));
             redirect('servicos');
-        }
 
     }
     

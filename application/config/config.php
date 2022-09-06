@@ -25,7 +25,7 @@ date_default_timezone_set('America/Sao_Paulo');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://localhost/plataforma_bluesun/';
+$config['base_url'] = 'http://localhost/public/bluesundobrasil/';
 
 /*
 |--------------------------------------------------------------------------
@@ -100,7 +100,7 @@ $config['charset'] = 'UTF-8';
 |
 | If you would like to use the 'hooks' feature you must enable it by
 | setting this variable to TRUE (boolean).  See the user guide for details.
-|
+| ALTERAR PARA TRUE PARA MINIFICAR O CÓDIGO FONTE NO BROWSER
 */
 $config['enable_hooks'] = FALSE;
 
@@ -379,11 +379,11 @@ $config['encryption_key'] = '';
 | except for 'cookie_prefix' and 'cookie_httponly', which are ignored here.
 |
 */
-$config['sess_driver'] = 'files';
+$config['sess_driver'] = 'database';
 $config['sess_cookie_name'] = 'ci_session';
-$config['sess_expiration'] = 7200;
-$config['sess_save_path'] = NULL;
-$config['sess_match_ip'] = FALSE;
+$config['sess_expiration'] = 0;
+$config['sess_save_path'] = 'ci_session';
+$config['sess_match_ip'] = TRUE;
 $config['sess_time_to_update'] = 300;
 $config['sess_regenerate_destroy'] = FALSE;
 

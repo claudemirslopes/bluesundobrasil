@@ -1,3 +1,4 @@
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"
 integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
 crossorigin="anonymous"></script>
@@ -58,6 +59,16 @@ crossorigin="anonymous"></script>
         });
     });
     </script>
+
+<style>
+    .form-control {
+        border: 1px solid #585858;
+    }
+    .border {
+        border: 1px solid #848484 !important;
+    }
+</style>
+
     <!-- PARRA LATERAL - SIDEBAR -->
     <?php $this->load->view('layout/sidebar') ?>
     <!-- PARRA LATERAL - SIDEBAR -->
@@ -95,14 +106,16 @@ crossorigin="anonymous"></script>
         </div>
 
         <!-- content -->
-        <div class="content mt-3">
+        <div class="content mt-1">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-secondary text-light">
                     <strong class="card-title" v-if="headerText">Cadastrar Fornecedor</strong>
                     <span class="float-right" style="color: #777;font-size: .9em;">
-                        <a title="Voltar" href="<?php echo base_url('fornecedores'); ?>" class="btn btn-success btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
+                        <a title="Voltar" href="<?php echo base_url('fornecedores'); ?>" class="btn btn-light btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
                     </span>
                 </div>
+                
+                <div class="card-body" style="border: 1px solid #A4A4A4;">
                 
                 <!-- Mensagem de sucesso -->
                 <?php if ($message = $this->session->flashdata('sucesso')): ?>
@@ -128,8 +141,8 @@ crossorigin="anonymous"></script>
                 <?php endif; ?>
                 <!-- Mensagem de erro -->
                 
-                <div class="card-body">
-                    <form method="post" name="form_add" class="user">
+            
+                    <form method="post" name="form_add" class="user" id="post">
                         
                         <fieldset class="border p-2" style="margin-top: -10px;">
                             <legend class="font-small"><i class="fa fa-cogs"></i> Configurações</legend>
@@ -284,3 +297,43 @@ crossorigin="anonymous"></script>
 
         </div>
         
+<script type="text/javascript">
+$("#cnpj").focusout(function(){
+        //Início do Comando AJAX
+        $.ajax({
+            //O campo URL diz o caminho de onde virá os dados
+            //É importante concatenar o valor digitado no CNPJ
+            url: 'http://localhost/BluesunPlataforma/dados/cnpj.php?cnpj='+$("#cnpj").val(),
+            //Atualização: caso use java, use cnpj.jsp, usando o outro exemplo.
+            //Aqui você deve preencher o tipo de dados que será lido,
+            //no caso, estamos lendo JSON.
+            dataType: 'json',
+            //SUCESS é referente a função que será executada caso
+            //ele consiga ler a fonte de dados com sucesso.
+            //O parâmetro dentro da função se refere ao nome da variável
+            //que você vai dar para ler esse objeto.
+            success: function(resposta){
+                    //Confere se houve erro e o imprime
+                    if(resposta.status == "ERROR"){
+                            alert(resposta.message + "\nPor favor, digite os dados manualmente.");
+                            $("#post #nome").focus().select();
+                            return false;
+                    }
+                    //Agora basta definir os valores que você deseja preencher
+                    //automaticamente nos campos acima.
+                    $("#post #nome").val(resposta.nome);
+                    $("#post #fantasia").val(resposta.fantasia);
+                    $("#post #atividade").val(resposta.atividade_principal[0].text + " (" + resposta.atividade_principal[0].code + ")");
+                    $("#post #telefone").val(resposta.telefone);
+                    $("#post #email").val(resposta.email);
+                    $("#post #logradouro").val(resposta.logradouro);
+                    $("#post #complemento").val(resposta.complemento);
+                    $("#post #bairro").val(resposta.bairro);
+                    $("#post #cidade").val(resposta.municipio);
+                    $("#post #uf").val(resposta.uf);
+                    $("#post #cep").val(resposta.cep);
+                    $("#post #numero").val(resposta.numero);
+                }
+            });
+});
+</script>

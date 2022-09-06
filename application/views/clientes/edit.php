@@ -1,3 +1,4 @@
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"
 integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
 crossorigin="anonymous"></script>
@@ -6,7 +7,7 @@ crossorigin="anonymous"></script>
     $(document).ready(function() {
         function limpa_formulário_cep() {
             // Limpa valores do formulário de cep.
-            $("#rua").val("");
+            $("#logradouro").val("");
             $("#bairro").val("");
             $("#cidade").val("");
             $("#uf").val("");
@@ -23,7 +24,7 @@ crossorigin="anonymous"></script>
                 //Valida o formato do CEP.
                 if(validacep.test(cep)) {
                     //Preenche os campos com "carregando..." enquanto consulta webservice.
-                    $("#rua").val("carregando...");
+                    $("#logradouro").val("carregando...");
                     $("#bairro").val("carregando...");
                     $("#cidade").val("carregando...");
                     $("#uf").val("carregando...");
@@ -32,7 +33,7 @@ crossorigin="anonymous"></script>
                     $.getJSON("https://viacep.com.br/ws/"+ cep +"/json/?callback=?", function(dados) {
                         if (!("erro" in dados)) {
                             //Atualiza os campos com os valores da consulta.
-                            $("#rua").val(dados.logradouro);
+                            $("#logradouro").val(dados.logradouro);
                             $("#bairro").val(dados.bairro);
                             $("#cidade").val(dados.localidade);
                             $("#uf").val(dados.uf);
@@ -58,6 +59,16 @@ crossorigin="anonymous"></script>
         });
     });
     </script>
+    
+<style>
+    .form-control {
+        border: 1px solid #585858;
+    }
+    .border {
+        border: 1px solid #848484 !important;
+    }
+</style>
+
     <!-- PARRA LATERAL - SIDEBAR -->
     <?php $this->load->view('layout/sidebar') ?>
     <!-- PARRA LATERAL - SIDEBAR -->
@@ -95,15 +106,17 @@ crossorigin="anonymous"></script>
         </div>
 
         <!-- content -->
-        <div class="content mt-3">
+        <div class="content mt-1">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-secondary text-light">
                     <strong class="card-title" v-if="headerText">Editar Autorizado</strong>
                     <span class="float-right" style="color: #777;font-size: .9em;">
                         <strong><i class="fa fa-clock-o"></i>&nbsp;&nbsp;Última alteração: </strong><?php echo formata_data_banco_com_hora($cliente->cliente_data_alteracao); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <a title="Voltar" href="<?php echo base_url('clientes'); ?>" class="btn btn-success btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
+                        <a title="Voltar" href="<?php echo base_url('clientes'); ?>" class="btn btn-light btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
                     </span>
                 </div>
+                
+                <div class="card-body" style="border: 1px solid #A4A4A4;">
                 
                 <!-- Mensagem de sucesso -->
                 <?php if ($message = $this->session->flashdata('sucesso')): ?>
@@ -129,8 +142,8 @@ crossorigin="anonymous"></script>
                 <?php endif; ?>
                 <!-- Mensagem de erro -->
                 
-                <div class="card-body">
-                    <form method="post" name="form_edit" class="user">
+               
+                    <form method="post" name="form_edit" class="user" id="post">
                         
                         <fieldset class="border p-2" style="margin-top: -10px;">
                             <legend class="font-small"><i class="fa fa-cogs"></i> Configurações</legend>
@@ -144,11 +157,11 @@ crossorigin="anonymous"></script>
                                 <div class="form-group col-md-3">
                                 <?php if ($cliente->cliente_pessoa == 1):  ?>
                                      <label for="cliente_cpf">CPF <span style="color: red;font-weight: bold;">*</span></label>
-                                     <input type="text" name="cliente_cpf" class="form-control form-control-user cpfmask" id="cliente_cpf" placeholder="CPF" value="<?php echo $cliente->cliente_cpf_cnpj ?>">
+                                     <input type="text" name="cliente_cpf" class="form-control form-control-user cpfmask" id="cpf" placeholder="CPF" value="<?php echo $cliente->cliente_cpf_cnpj ?>">
                                      <?php echo form_error('cliente_cpf', '<small class="form-text text-danger">','</small>') ?>
                                 <?php else: ?>
                                      <label for="cliente_cnpj">CNPJ <span style="color: red;font-weight: bold;">*</span></label>
-                                     <input type="text" name="cliente_cnpj" class="form-control form-control-user cnpjmask" id="cliente_cnpj" placeholder="CNPJ" value="<?php echo $cliente->cliente_cpf_cnpj ?>">
+                                     <input type="text" name="cliente_cnpj" class="form-control form-control-user cnpjmask" id="cnpj" placeholder="CNPJ" value="<?php echo $cliente->cliente_cpf_cnpj ?>">
                                      <?php echo form_error('cliente_cnpj', '<small class="form-text text-danger">','</small>') ?>
                                 <?php endif; ?>                                    
                                 </div>
@@ -191,7 +204,7 @@ crossorigin="anonymous"></script>
                                 <?php else: ?>
                                     <label for="cliente_nome">Razão Social <span style="color: red;font-weight: bold;">*</span></label>
                                 <?php endif; ?>
-                                    <input type="text" name="cliente_nome" class="form-control form-control-user" id="cliente_nome" placeholder="<?php echo ($cliente->cliente_pessoa == 1 ? 'Nome' : 'Razão Social') ?>" value="<?php echo $cliente->cliente_nome ?>">
+                                    <input type="text" name="cliente_nome" class="form-control form-control-user" id="nome" placeholder="<?php echo ($cliente->cliente_pessoa == 1 ? 'Nome' : 'Razão Social') ?>" value="<?php echo $cliente->cliente_nome ?>">
                                     <?php echo form_error('cliente_nome', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                                 <div class="form-group col-md-7">
@@ -200,7 +213,7 @@ crossorigin="anonymous"></script>
                                 <?php else: ?>
                                     <label for="cliente_sobrenome">Nome Fantasia <span style="color: red;font-weight: bold;">*</span></label>
                                 <?php endif; ?>
-                                    <input type="text" name="cliente_sobrenome" class="form-control form-control-user" id="cliente_sobrenome" placeholder="<?php echo ($cliente->cliente_pessoa == 1 ? 'Sobrenome' : 'Nome Fantasia') ?>" value="<?php echo $cliente->cliente_sobrenome ?>">
+                                    <input type="text" name="cliente_sobrenome" class="form-control form-control-user" id="fantasia" placeholder="<?php echo ($cliente->cliente_pessoa == 1 ? 'Sobrenome' : 'Nome Fantasia') ?>" value="<?php echo $cliente->cliente_sobrenome ?>">
                                     <?php echo form_error('cliente_sobrenome', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                             </div>
@@ -217,18 +230,25 @@ crossorigin="anonymous"></script>
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label for="cliente_email">E-mail <span style="color: red;font-weight: bold;">*</span></label>
-                                    <input type="email" name="cliente_email" class="form-control form-control-user" id="cliente_email" placeholder="E-mail" value="<?php echo $cliente->cliente_email ?>">
+                                    <input type="email" name="cliente_email" class="form-control form-control-user" id="email" placeholder="E-mail" value="<?php echo $cliente->cliente_email ?>">
                                     <?php echo form_error('cliente_email', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                                 <div class="form-group col-md-3">
                                     <label for="cliente_telefone">Telefone Fixo <span style="color: red;font-weight: bold;">*</span></label>
-                                    <input type="text" name="cliente_telefone" class="form-control form-control-user telefone" id="cliente_telefone" placeholder="Telefone Fixo" value="<?php echo $cliente->cliente_telefone ?>">
+                                    <input type="text" name="cliente_telefone" class="form-control form-control-user telefone" id="telefone" placeholder="Telefone Fixo" value="<?php echo $cliente->cliente_telefone ?>">
                                     <?php echo form_error('cliente_telefone', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                                 <div class="form-group col-md-3">
                                     <label for="cliente_celular">Celular <span style="color: red;font-weight: bold;">*</span></label>
                                     <input type="text" name="cliente_celular" class="form-control form-control-user celular" id="cliente_celular" placeholder="Celular" value="<?php echo $cliente->cliente_celular ?>">
                                     <?php echo form_error('cliente_celular', '<small class="form-text text-danger">','</small>') ?>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <label for="cliente_responsavel">Responsável <span style="color: red;font-weight: bold;">*</span></label>
+                                    <input type="text" name="cliente_responsavel" class="form-control form-control-user" id="cliente_responsavel" placeholder="Nome do Responsável" value="<?php echo $cliente->cliente_responsavel ?>">
+                                    <?php echo form_error('cliente_responsavel', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                             </div>
                         </fieldset>
@@ -243,7 +263,7 @@ crossorigin="anonymous"></script>
                                 </div>
                                 <div class="form-group col-md-9">
                                     <label for="cliente_endereco">Endereço <span style="color: red;font-weight: bold;">*</span></label>
-                                    <input type="text" name="cliente_endereco" class="form-control form-control-user" id="rua" placeholder="Logradouro, rua, etc..." value="<?php echo $cliente->cliente_endereco ?>">
+                                    <input type="text" name="cliente_endereco" class="form-control form-control-user" id="logradouro" placeholder="Logradouro, rua, etc..." value="<?php echo $cliente->cliente_endereco ?>">
                                     <?php echo form_error('cliente_endereco', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                                 <div class="form-group col-md-1">
@@ -316,6 +336,27 @@ crossorigin="anonymous"></script>
                             </div>
                         </fieldset>
                         
+                        <fieldset class="mt-2 border p-2">
+                            <legend class="font-small"><i class="fa fa-unlock-alt"></i> Dados de acesso</legend>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="cliente_user">Usuário</label>
+                                    <input type="text" name="cliente_user" class="form-control form-control-user" id="cliente_user" value="<?php echo $cliente->cliente_user ?>" readonly="">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="cliente_senha">Senha</label>
+                                    <input type="password" name="cliente_senha" class="form-control form-control-user" id="cliente_senha">
+                                    <small class="form-text text-info font-weight-bold">Deixe este campo em branco caso não queira trocar a senha</small>
+                                    <?php echo form_error('cliente_senha', '<small class="form-text text-danger">','</small>') ?>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="cliente_senha_repete">Confirmar Senha</label>
+                                    <input type="password" name="cliente_senha_repete" class="form-control form-control-user" id="cliente_senha_repete">
+                                    <?php echo form_error('cliente_senha_repete', '<small class="form-text text-danger">','</small>') ?>
+                                </div>
+                            </div>
+                        </fieldset>
+                        
                         <input type="hidden" name="cliente_id" value="<?php echo $cliente->cliente_id; ?>">
                         <button type="submit" class="btn btn-primary btn-sm float-right mt-1"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Editar autorizado</button>
                     </form>
@@ -324,3 +365,44 @@ crossorigin="anonymous"></script>
             </div>
 
         </div>
+        
+<script type="text/javascript">
+$("#cnpj").focusout(function(){
+        //Início do Comando AJAX
+        $.ajax({
+            //O campo URL diz o caminho de onde virá os dados
+            //É importante concatenar o valor digitado no CNPJ
+            url: 'http://localhost/BluesunPlataforma/dados/cnpj.php?cnpj='+$("#cnpj").val(),
+            //Atualização: caso use java, use cnpj.jsp, usando o outro exemplo.
+            //Aqui você deve preencher o tipo de dados que será lido,
+            //no caso, estamos lendo JSON.
+            dataType: 'json',
+            //SUCESS é referente a função que será executada caso
+            //ele consiga ler a fonte de dados com sucesso.
+            //O parâmetro dentro da função se refere ao nome da variável
+            //que você vai dar para ler esse objeto.
+            success: function(resposta){
+                    //Confere se houve erro e o imprime
+                    if(resposta.status == "ERROR"){
+                            alert(resposta.message + "\nPor favor, digite os dados manualmente.");
+                            $("#post #nome").focus().select();
+                            return false;
+                    }
+                    //Agora basta definir os valores que você deseja preencher
+                    //automaticamente nos campos acima.
+                    $("#post #nome").val(resposta.nome);
+                    $("#post #fantasia").val(resposta.fantasia);
+                    $("#post #atividade").val(resposta.atividade_principal[0].text + " (" + resposta.atividade_principal[0].code + ")");
+                    $("#post #telefone").val(resposta.telefone);
+                    $("#post #email").val(resposta.email);
+                    $("#post #logradouro").val(resposta.logradouro);
+                    $("#post #complemento").val(resposta.complemento);
+                    $("#post #bairro").val(resposta.bairro);
+                    $("#post #cidade").val(resposta.municipio);
+                    $("#post #uf").val(resposta.uf);
+                    $("#post #cep").val(resposta.cep);
+                    $("#post #numero").val(resposta.numero);
+                }
+            });
+});
+</script>

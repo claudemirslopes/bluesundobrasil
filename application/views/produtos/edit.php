@@ -1,4 +1,13 @@
-    <!-- PARRA LATERAL - SIDEBAR -->
+<style>
+    .form-control {
+        border: 1px solid #585858;
+    }
+    .border {
+        border: 1px solid #848484 !important;
+    }
+</style>
+
+<!-- PARRA LATERAL - SIDEBAR -->
     <?php $this->load->view('layout/sidebar') ?>
     <!-- PARRA LATERAL - SIDEBAR -->
 
@@ -35,15 +44,17 @@
         </div>
 
         <!-- content -->
-        <div class="content mt-3">
+        <div class="content mt-1">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-secondary text-light">
                     <strong class="card-title" v-if="headerText">Editar Produto</strong>
                     <span class="float-right" style="color: #777;font-size: .9em;">
                         <strong><i class="fa fa-clock-o"></i>&nbsp;&nbsp;Última alteração: </strong><?php echo formata_data_banco_com_hora($produto->produto_data_alteracao); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <a title="Voltar" href="<?php echo base_url('produtos'); ?>" class="btn btn-success btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
+                        <a title="Voltar" href="<?php echo base_url('produtos'); ?>" class="btn btn-light btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
                     </span>
                 </div>
+                
+                <div class="card-body" style="border: 1px solid #A4A4A4;">
                 
                 <!-- Mensagem de sucesso -->
                 <?php if ($message = $this->session->flashdata('sucesso')): ?>
@@ -69,7 +80,7 @@
                 <?php endif; ?>
                 <!-- Mensagem de erro -->
                 
-                <div class="card-body">
+                
                     <form method="post" name="form_edit" class="user">
                         
                         <fieldset class="border p-2" style="margin-top: -10px;">
@@ -88,8 +99,9 @@
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-4">
-                                    <label for="produto_marca_id">Marca <span style="color: red;font-weight: bold;">*</span></label>
+                                    <label for="produto_marca_id">Marca</label>
                                     <select name="produto_marca_id" class="form-control custom-select" id="produto_marca_id">
+                                        <option value="0">Selecione a marca</option>
                                         <?php foreach($marcas as $marca): ?>
                                         <option value="<?php echo $marca->marca_id ?>" <?php echo ($marca->marca_id == $produto->produto_marca_id ? 'selected' : ''); ?>><?php echo $marca->marca_nome; ?></option>
                                         <?php endforeach; ?>
@@ -105,8 +117,9 @@
                                     
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label for="produto_fornecedor_id">Fornecedor <span style="color: red;font-weight: bold;">*</span></label> 
+                                    <label for="produto_fornecedor_id">Fornecedor</label> 
                                     <select name="produto_fornecedor_id" class="form-control custom-select" id="produto_fornecedor_id">
+                                        <option value="0">Selecione o fornecedor</option>
                                         <?php foreach($fornecedores as $fornecedor): ?>
                                         <option value="<?php echo $fornecedor->fornecedor_id ?>" <?php echo ($fornecedor->fornecedor_id == $produto->produto_fornecedor_id ? 'selected' : ''); ?>><?php echo $fornecedor->fornecedor_nome_fantasia ?></option>
                                         <?php endforeach; ?>
@@ -147,6 +160,23 @@
                                     <label for="produto_preco_venda">Preço venda <span style="color: red;font-weight: bold;">*</span></label>
                                     <input type="text" name="produto_preco_venda" class="form-control form-control-user money" id="produto_preco_venda" placeholder="Ex: 99,99" value="<?php echo $produto->produto_preco_venda; ?>">
                                     <?php echo form_error('produto_preco_venda', '<small class="form-text text-danger">','</small>') ?>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="produto_potencia">Potência</label> 
+                                    <input type="text" name="produto_potencia" class="form-control form-control-user" id="produto_potencia" placeholder="Potência" value="<?php echo $produto->produto_potencia; ?>">
+                                    <?php echo form_error('produto_potencia', '<small class="form-text text-danger">','</small>') ?>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="produto_eficiencia">Eficiência</label> 
+                                    <input type="text" name="produto_eficiencia" class="form-control form-control-user efic" id="produto_eficiencia" placeholder="Eficiência" value="<?php echo $produto->produto_eficiencia; ?>">
+                                    <?php echo form_error('produto_eficiencia', '<small class="form-text text-danger">','</small>') ?>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="produto_codigo_interno">Código Interno</label> 
+                                    <input type="text" name="produto_codigo_interno" class="form-control form-control-user" id="produto_codigo_interno" placeholder="Código Interno" value="<?php echo $produto->produto_codigo_interno; ?>">
+                                    <?php echo form_error('produto_codigo_interno', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                             </div>
                             <div class="form-row">

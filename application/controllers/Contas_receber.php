@@ -13,7 +13,15 @@ class Contas_receber extends CI_Controller{
             redirect('login');
         }
         
+        # multiple groups (by name)
+        $group = array(1, 3);
+        if (!$this->ion_auth->in_group($group)) {
+          $this->session->set_flashdata('info', 'Você não tem permissão para acessar o módulo <b>Financeiro</b>');
+          redirect('home');
+        }
+        
         $this->load->model('financeiro_model');
+        $this->load->model('home_model');
         
     }
     
@@ -40,9 +48,72 @@ class Contas_receber extends CI_Controller{
               'assets/js/init-scripts/data-table/datatables-init.js',  
             ),
             
+            // Home
+            'soma_vendas' => $this->home_model->get_sum_vendas(),
+            'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+            'soma_receber' => $this->home_model->get_sum_receber(),
+            'soma_pagar' => $this->home_model->get_sum_pagar(),
+            'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+            'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+            'top_servicos' => $this->home_model->get_servicos_mais_vendidos(), 
+            
             'contas_receber' => $this->financeiro_model->get_all_receber(),
             
         );
+        
+        //CENTRAL DE NOTIFICAÇÕES
+        $contador_notificacoes = 0;
+        if ($this->home_model->get_contas_receber_vencidas()) {
+            
+            $data['contas_receber_vencidas'] = TRUE;
+            $contador_notificacoes ++;
+        } 
+//        else {
+//            $data['contas_receber_vencidas'] = FALSE;
+//        }
+        if ($this->home_model->get_contas_pagar_vencidas()) {
+            
+            $data['contas_pagar_vencidas'] = TRUE;
+            $contador_notificacoes ++;
+        } 
+//        else {
+//            $data['contas_pagar_vencidas'] = FALSE;
+//        }
+        if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+            
+            $data['contas_pagar_vence_hoje'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_contas_receber_vencem_hoje()) {
+            
+            $data['contas_receber_vence_hoje'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_usuarios_desativados()) {
+            
+            $data['usuarios_desativados'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_produtos_sem_estoque()) {
+            
+            $data['produto_sem_estoque'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_reclamacoes_pendentes()) {
+            
+            $data['reclama_pendente'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->ion_auth->is_admin()) {
+           if ($this->home_model->get_tickets_pendentes()) {
+            
+                $data['ticket_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+        }
+        
+        
+        $data['contador_notificacoes'] = $contador_notificacoes;
         
 //        echo '<pre>';
 //        print_r($data['contas_receber']);
@@ -58,7 +129,7 @@ class Contas_receber extends CI_Controller{
     public function add() {
         
         // formn_validation
-            $this->form_validation->set_rules('conta_receber_cliente_id', 'cliente', 'trim|required|max_length[15]');
+            $this->form_validation->set_rules('conta_receber_cliente_id', 'cliente', 'trim|required|max_length[1]');
             $this->form_validation->set_rules('conta_receber_data_vencimento', 'data de vencimento', 'trim|required');
             $this->form_validation->set_rules('conta_receber_valor', 'valor', 'trim|required');
             $this->form_validation->set_rules('conta_receber_obs', 'observação', 'max_length[100]');
@@ -100,23 +171,91 @@ class Contas_receber extends CI_Controller{
             
             $data = array(
             
-                'titulo' => 'Cadatrar Conta a Receber',
+                'titulo' => 'Cadastrar Conta a Receber',
                 
-                'styles' => array (
+                'styles' => array(
                     'vendors/select2/select2.min.css',
+                    'vendors/autocomplete/jquery-ui.css',
+                    'vendors/autocomplete/estilos.css',
                 ),
 
                 'scripts' => array (
+                    'vendors/autocomplete/jquery-migrate.js', //Nesta ordem
+                    'vendors/calcx/jquery-calx-sample-2.2.8.min.js',
+                    'vendors/calcx/os.js',
                     'vendors/select2/select2.min.js',
                     'vendors/select2/app.js',
-                    'vendors/mask/jquery_3.2.1.min.js',
+                    'vendors/autocomplete/jquery-ui.js',
                     'vendors/mask/jquery.mask.min.js',
                     'vendors/mask/app.js',
                 ),
+                
+                // Home
+                'soma_vendas' => $this->home_model->get_sum_vendas(),
+                'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+                'soma_receber' => $this->home_model->get_sum_receber(),
+                'soma_pagar' => $this->home_model->get_sum_pagar(),
+                'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+                'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+                'top_servicos' => $this->home_model->get_servicos_mais_vendidos(),
 
-                'clientes' => $this->core_model->get_all('clientes'),
+                'clientes' => $this->core_model->get_all('clientes', array('cliente_ativo' => 1)),
 
             );
+            
+            //CENTRAL DE NOTIFICAÇÕES
+            $contador_notificacoes = 0;
+            if ($this->home_model->get_contas_receber_vencidas()) {
+
+                $data['contas_receber_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_receber_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencidas()) {
+
+                $data['contas_pagar_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_pagar_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+
+                $data['contas_pagar_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_contas_receber_vencem_hoje()) {
+
+                $data['contas_receber_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_usuarios_desativados()) {
+
+                $data['usuarios_desativados'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_produtos_sem_estoque()) {
+
+                $data['produto_sem_estoque'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_reclamacoes_pendentes()) {
+
+                $data['reclama_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->ion_auth->is_admin()) {
+               if ($this->home_model->get_tickets_pendentes()) {
+
+                    $data['ticket_pendente'] = TRUE;
+                    $contador_notificacoes ++;
+                } 
+            }
+
+
+            $data['contador_notificacoes'] = $contador_notificacoes;
 
                 // Carrega a view de editar contas_receber
                $this->load->view('layout/header', $data);
@@ -179,22 +318,90 @@ class Contas_receber extends CI_Controller{
             
                 'titulo' => 'Atualizar Conta a Receber',
                 
-                'styles' => array (
+                'styles' => array(
                     'vendors/select2/select2.min.css',
+                    'vendors/autocomplete/jquery-ui.css',
+                    'vendors/autocomplete/estilos.css',
                 ),
 
                 'scripts' => array (
+                    'vendors/autocomplete/jquery-migrate.js', //Nesta ordem
+                    'vendors/calcx/jquery-calx-sample-2.2.8.min.js',
+                    'vendors/calcx/os.js',
                     'vendors/select2/select2.min.js',
                     'vendors/select2/app.js',
-                    'vendors/mask/jquery_3.2.1.min.js',
+                    'vendors/autocomplete/jquery-ui.js',
                     'vendors/mask/jquery.mask.min.js',
                     'vendors/mask/app.js',
                 ),
+                
+                // Home
+                'soma_vendas' => $this->home_model->get_sum_vendas(),
+                'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+                'soma_receber' => $this->home_model->get_sum_receber(),
+                'soma_pagar' => $this->home_model->get_sum_pagar(),
+                'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+                'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+                'top_servicos' => $this->home_model->get_servicos_mais_vendidos(), 
 
                 'conta_receber' => $this->core_model->get_by_id('contas_receber', array('conta_receber_id' => $conta_receber_id)),
-                'clientes' => $this->core_model->get_all('clientes'),
+                'clientes' => $this->core_model->get_all('clientes', array('cliente_ativo' => 1)),
 
             );
+            
+            //CENTRAL DE NOTIFICAÇÕES
+            $contador_notificacoes = 0;
+            if ($this->home_model->get_contas_receber_vencidas()) {
+
+                $data['contas_receber_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_receber_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencidas()) {
+
+                $data['contas_pagar_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_pagar_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+
+                $data['contas_pagar_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_contas_receber_vencem_hoje()) {
+
+                $data['contas_receber_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_usuarios_desativados()) {
+
+                $data['usuarios_desativados'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_produtos_sem_estoque()) {
+
+                $data['produto_sem_estoque'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_reclamacoes_pendentes()) {
+
+                $data['reclama_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->ion_auth->is_admin()) {
+               if ($this->home_model->get_tickets_pendentes()) {
+
+                    $data['ticket_pendente'] = TRUE;
+                    $contador_notificacoes ++;
+                } 
+            }
+
+
+            $data['contador_notificacoes'] = $contador_notificacoes;
 
                 // Carrega a view de editar contas_receber
                $this->load->view('layout/header', $data);

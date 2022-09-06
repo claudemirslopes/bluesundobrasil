@@ -1,3 +1,11 @@
+<style>
+    .form-control {
+        border: 1px solid #585858;
+    }
+    .border {
+        border: 1px solid #848484 !important;
+    }
+</style>
 
     <!-- PARRA LATERAL - SIDEBAR -->
     <?php $this->load->view('layout/sidebar') ?>
@@ -35,12 +43,15 @@
         </div>
 
         <!-- content -->
-        <div class="content mt-3">
+        <div class="content mt-1">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-secondary text-light">
                     <strong class="card-title" v-if="headerText">Contas a Pagar</strong>
-                    <a title="Cadastrar novo conta_pagar" href="<?php echo base_url('contas_pagar/add'); ?>" class="btn btn-success btn-sm float-right"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;Nova conta a pagar</a>
+                    <a title="Cadastrar novo conta_pagar" href="<?php echo base_url('contas_pagar/add'); ?>" class="btn btn-light btn-sm float-right"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;Nova conta a pagar</a>
                 </div>
+                
+                <div class="card-body" style="border: 1px solid #A4A4A4;">
+                    
                 <!-- Mensagem de sucesso -->
                 <?php if ($message = $this->session->flashdata('sucesso')): ?>
                     <div class="alert  alert-success alert-dismissible fade show " role="alert">
@@ -77,7 +88,7 @@
                 <?php endif; ?>
                 <!-- Mensagem de info -->
                 
-                <div class="card-body">
+                
                    <table class="bootstrap-data-table-export table table-striped table-bordered">
                         <thead>
                             <tr>

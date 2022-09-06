@@ -1,4 +1,13 @@
-    <!-- PARRA LATERAL - SIDEBAR -->
+<style>
+    .form-control {
+        border: 1px solid #585858;
+    }
+    .border {
+        border: 1px solid #848484 !important;
+    }
+</style>
+
+<!-- PARRA LATERAL - SIDEBAR -->
     <?php $this->load->view('layout/sidebar') ?>
     <!-- PARRA LATERAL - SIDEBAR -->
 
@@ -34,16 +43,18 @@
         </div>
 
         <!-- content -->
-        <div class="content mt-3">
+        <div class="content mt-1">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-secondary text-light">
                     <strong class="card-title" v-if="headerText">Editar Conta a Pagar</strong>
                     <span class="float-right" style="color: #777;font-size: .9em;">
                         <strong><i class="fa fa-clock-o"></i>&nbsp;&nbsp;Última alteração: </strong><?php echo formata_data_banco_com_hora($conta_pagar->conta_pagar_data_alteracao); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <a title="Voltar" href="<?php echo base_url('contas_pagar'); ?>" class="btn btn-success btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
+                        <a title="Voltar" href="<?php echo base_url('contas_pagar'); ?>" class="btn btn-light btn-sm"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;Voltar</a>
                     </span>
                 </div>
                 
+                <div class="card-body" style="border: 1px solid #A4A4A4;">
+                    
                 <!-- Mensagem de sucesso -->
                 <?php if ($message = $this->session->flashdata('sucesso')): ?>
                     <div class="alert  alert-success alert-dismissible fade show " role="alert">
@@ -68,7 +79,7 @@
                 <?php endif; ?>
                 <!-- Mensagem de erro -->
                 
-                <div class="card-body">
+               
                     <form method="post" name="form_edit" class="user">
                         
                         <fieldset class="border p-2" style="margin-top: -10px;">
@@ -76,7 +87,7 @@
                             <div class="form-row">
                                 <div class="form-group col-md-5">
                                     <label for="conta_pagar_fornecedor_id">Fornecedor <span style="color: red;font-weight: bold;">*</span></label> 
-                                    <select name="conta_pagar_fornecedor_id" class="custom-select contas_pagar">
+                                    <select style="pointer-events: none;touch-action: none;"  name="conta_pagar_fornecedor_id" class="custom-select">
                                         <?php foreach($fornecedores as $fornecedor): ?>
                                         <option value="<?php echo $fornecedor->fornecedor_id ?>" <?php echo ($fornecedor->fornecedor_id == $conta_pagar->conta_pagar_fornecedor_id ? 'selected' : ''); ?>><?php echo $fornecedor->fornecedor_nome_fantasia ?></option>
                                         <?php endforeach; ?>
@@ -85,7 +96,7 @@
                                 </div>
                                 <div class="form-group col-md-2">
                                     <label for="conta_pagar_valor">Valor <span style="color: red;font-weight: bold;">*</span></label>
-                                    <input  <?php echo ($conta_pagar->conta_pagar_status == 1 ? 'readonly' : '');?> type="text" name="conta_pagar_valor" class="form-control form-control-user money" id="conta_pagar_valor" placeholder="Ex: 99,99" value="<?php echo $conta_pagar->conta_pagar_valor; ?>">
+                                    <input  <?php echo ($conta_pagar->conta_pagar_status == 1 ? 'readonly' : '');?> type="text" name="conta_pagar_valor" class="form-control form-control-user money2" id="conta_pagar_valor" placeholder="Ex: 99,99" value="<?php echo $conta_pagar->conta_pagar_valor; ?>">
                                     <?php echo form_error('conta_pagar_valor', '<small class="form-text text-danger">','</small>') ?>
                                 </div>
                                 <div class="form-group col-md-3">

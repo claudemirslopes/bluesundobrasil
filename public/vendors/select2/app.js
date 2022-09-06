@@ -53,5 +53,18 @@ $(document).ready(function () {
         }
     });
 
+    $('.cli_fran').select2({
+        placeholder: "Cliente",
+        allowClear: true,
+        "language": {
+            "noResults": function () {
+                return '<span class="text-danger">Cliente não encontrado</span> <a href="' + BASE_URL + 'franquias/clientes/add" target="_blank" class="btn btn-primary btn-sm">Cadastrar</a>';
+            }
+        },
+        escapeMarkup: function (markup) {
+            return markup;
+        }
+    });
+
 });
 

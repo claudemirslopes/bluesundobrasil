@@ -13,6 +13,16 @@ class Clientes extends CI_Controller{
             redirect('login');
         }
         
+        # multiple groups (by name)
+        $group = array(1, 3);
+        if (!$this->ion_auth->in_group($group)) {
+          $this->session->set_flashdata('info', 'Você não tem permissão para acessar o módulo de <b>Autorizados</b>');
+          redirect('home');
+        }
+        
+        $this->load->model('clientes_model');        
+        $this->load->model('home_model');
+        
     }
     
     public function index() {
@@ -38,9 +48,73 @@ class Clientes extends CI_Controller{
               'assets/js/init-scripts/data-table/datatables-init.js',  
             ),
             
-            'clientes' => $this->core_model->get_all('clientes'),
+            
+            // Home
+            'soma_vendas' => $this->home_model->get_sum_vendas(),
+            'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+            'soma_receber' => $this->home_model->get_sum_receber(),
+            'soma_pagar' => $this->home_model->get_sum_pagar(),
+            'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+            'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+            'top_servicos' => $this->home_model->get_servicos_mais_vendidos(), 
+            
+            'clientes' => $this->clientes_model->get_all('clientes'),
             
         );
+        
+        //CENTRAL DE NOTIFICAÇÕES
+        $contador_notificacoes = 0;
+        if ($this->home_model->get_contas_receber_vencidas()) {
+            
+            $data['contas_receber_vencidas'] = TRUE;
+            $contador_notificacoes ++;
+        } 
+//        else {
+//            $data['contas_receber_vencidas'] = FALSE;
+//        }
+        if ($this->home_model->get_contas_pagar_vencidas()) {
+            
+            $data['contas_pagar_vencidas'] = TRUE;
+            $contador_notificacoes ++;
+        } 
+//        else {
+//            $data['contas_pagar_vencidas'] = FALSE;
+//        }
+        if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+            
+            $data['contas_pagar_vence_hoje'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_contas_receber_vencem_hoje()) {
+            
+            $data['contas_receber_vence_hoje'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_usuarios_desativados()) {
+            
+            $data['usuarios_desativados'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_produtos_sem_estoque()) {
+            
+            $data['produto_sem_estoque'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_reclamacoes_pendentes()) {
+            
+            $data['reclama_pendente'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->ion_auth->is_admin()) {
+           if ($this->home_model->get_tickets_pendentes()) {
+            
+                $data['ticket_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+        }
+        
+        
+        $data['contador_notificacoes'] = $contador_notificacoes;
         
 //        echo '<pre>';
 //        print_r($data['clientes']);
@@ -73,6 +147,7 @@ class Clientes extends CI_Controller{
         if ($this->input->post('cliente_celular')) {
             $this->form_validation->set_rules('cliente_celular', 'celular', 'trim|max_length[15]|is_unique[clientes.cliente_celular]');
         }
+        $this->form_validation->set_rules('cliente_responsavel', 'responsável', 'trim|required|min_length[4]|max_length[250]');
         $this->form_validation->set_rules('cliente_cep', 'CEP', 'trim|required|max_length[10]');
         $this->form_validation->set_rules('cliente_endereco', 'endereço', 'trim|required|max_length[155]');
         $this->form_validation->set_rules('cliente_numero_endereco', 'número', 'trim|max_length[10]');
@@ -81,11 +156,14 @@ class Clientes extends CI_Controller{
         $this->form_validation->set_rules('cliente_cidade', 'cidade', 'trim|required|max_length[50]');
         $this->form_validation->set_rules('cliente_estado', 'estado', 'trim|required|exact_length[2]');
         $this->form_validation->set_rules('cliente_obs', 'observação', 'max_length[500]');
+        $this->form_validation->set_rules('cliente_user', 'Usuário', 'required|min_length[3]|is_unique[clientes.cliente_user]');
+        $this->form_validation->set_rules('cliente_senha', 'Senha', 'required|min_length[5]');
+        $this->form_validation->set_rules('cliente_senha_repete', 'Confirmar Senha', 'matches[cliente_senha]');
 
         if ($this->form_validation->run()) { 
             // Teste para ver se valida
 //                exit('Validado');
-
+            
             $data = elements(
 
                 array(
@@ -98,6 +176,7 @@ class Clientes extends CI_Controller{
                     'cliente_email',
                     'cliente_telefone',
                     'cliente_celular',
+                    'cliente_responsavel',
                     'cliente_cep',
                     'cliente_endereco',
                     'cliente_numero_endereco',
@@ -107,15 +186,17 @@ class Clientes extends CI_Controller{
                     'cliente_estado',
                     'cliente_ativo',
                     'cliente_obs',
+                    'cliente_user',
                 ), $this->input->post()
-
+                    
         );
-
+        
         if ($cliente_pessoa == 1) {
             $data['cliente_cpf_cnpj'] = $this->input->post('cliente_cpf');
         } else {
             $data['cliente_cpf_cnpj'] = $this->input->post('cliente_cnpj');
         }
+        $data['cliente_senha'] = sha1($this->input->post('cliente_senha'));
 
         // Colocar todo texto em maiúsculo
 //            $data['cliente_estado'] = strtoupper($this->input->post('cliente_estado'));
@@ -139,8 +220,71 @@ class Clientes extends CI_Controller{
                 'vendors/mask/jquery.maskedinput.min.js',
                 'assets/js/clientes.js',
             ),
+                
+            // Home
+            'soma_vendas' => $this->home_model->get_sum_vendas(),
+            'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+            'soma_receber' => $this->home_model->get_sum_receber(),
+            'soma_pagar' => $this->home_model->get_sum_pagar(),
+            'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+            'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+            'top_servicos' => $this->home_model->get_servicos_mais_vendidos(), 
 
         );
+            
+        //CENTRAL DE NOTIFICAÇÕES
+        $contador_notificacoes = 0;
+        if ($this->home_model->get_contas_receber_vencidas()) {
+            
+            $data['contas_receber_vencidas'] = TRUE;
+            $contador_notificacoes ++;
+        } 
+//        else {
+//            $data['contas_receber_vencidas'] = FALSE;
+//        }
+        if ($this->home_model->get_contas_pagar_vencidas()) {
+            
+            $data['contas_pagar_vencidas'] = TRUE;
+            $contador_notificacoes ++;
+        } 
+//        else {
+//            $data['contas_pagar_vencidas'] = FALSE;
+//        }
+        if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+            
+            $data['contas_pagar_vence_hoje'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_contas_receber_vencem_hoje()) {
+            
+            $data['contas_receber_vence_hoje'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_usuarios_desativados()) {
+            
+            $data['usuarios_desativados'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_produtos_sem_estoque()) {
+            
+            $data['produto_sem_estoque'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->home_model->get_reclamacoes_pendentes()) {
+            
+            $data['reclama_pendente'] = TRUE;
+            $contador_notificacoes ++;
+        }
+        if ($this->ion_auth->is_admin()) {
+           if ($this->home_model->get_tickets_pendentes()) {
+            
+                $data['ticket_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+        }
+        
+        
+        $data['contador_notificacoes'] = $contador_notificacoes;
 
 //                echo '<pre>';
 //                print_r($data['cliente']);
@@ -180,6 +324,7 @@ class Clientes extends CI_Controller{
             if ($this->input->post('cliente_celular')) {
                 $this->form_validation->set_rules('cliente_celular', 'celular', 'trim|max_length[15]|callback_check_celular');
             }
+            $this->form_validation->set_rules('cliente_responsavel', 'responsável', 'trim|required|min_length[4]|max_length[250]');
             $this->form_validation->set_rules('cliente_cep', 'CEP', 'trim|required|max_length[10]');
             $this->form_validation->set_rules('cliente_endereco', 'endereço', 'trim|required|max_length[155]');
             $this->form_validation->set_rules('cliente_numero_endereco', 'número', 'trim|max_length[10]');
@@ -188,10 +333,21 @@ class Clientes extends CI_Controller{
             $this->form_validation->set_rules('cliente_cidade', 'cidade', 'trim|required|max_length[50]');
             $this->form_validation->set_rules('cliente_estado', 'estado', 'trim|required|exact_length[2]');
             $this->form_validation->set_rules('cliente_obs', 'observação', 'max_length[500]');
+            $this->form_validation->set_rules('cliente_user', 'Usuário', 'required|min_length[3]|callback_check_user');
+            $this->form_validation->set_rules('cliente_senha', 'Senha', 'min_length[5]');
+            $this->form_validation->set_rules('cliente_senha_repete', 'Confirmar Senha', 'matches[cliente_senha]');
             
             if ($this->form_validation->run()) { 
                 // Teste para ver se valida
 //                exit('Validado');
+                
+                $cliente_ativo = $this->input->post('cliente_ativo');
+                if ($this->db->table_exists('contas_receber')) {
+                    if ($cliente_ativo == 0 && $this->core_model->get_by_id('contas_receber', array('conta_receber_cliente_id' => $cliente_id, 'conta_receber_status' => 0))) {
+                        $this->session->set_flashdata('info', 'Este cliente não pode ser desabilitado. (Existe pendências em <b>Contas a Receber</b>)');
+                        redirect('clientes');
+                    }
+                }
                 
                 $data = elements(
 
@@ -205,6 +361,7 @@ class Clientes extends CI_Controller{
                         'cliente_email',
                         'cliente_telefone',
                         'cliente_celular',
+                        'cliente_responsavel',
                         'cliente_cep',
                         'cliente_endereco',
                         'cliente_numero_endereco',
@@ -214,6 +371,7 @@ class Clientes extends CI_Controller{
                         'cliente_estado',
                         'cliente_ativo',
                         'cliente_obs',
+                        'cliente_user',
                     ), $this->input->post()
 
             );
@@ -223,12 +381,17 @@ class Clientes extends CI_Controller{
             } else {
                 $data['cliente_cpf_cnpj'] = $this->input->post('cliente_cnpj');
             }
+            $data['cliente_senha'] = sha1($this->input->post('cliente_senha'));
             
             // Colocar todo texto em maiúsculo
 //            $data['cliente_estado'] = strtoupper($this->input->post('cliente_estado'));
             
             // Limpar dados maliciosos
             $data = html_escape($data);
+            $password = $this->input->post('cliente_senha');
+            if (!$password) { 
+                unset($data['cliente_senha']);
+            }
             
             $this->core_model->update('clientes', $data, array('cliente_id' => $cliente_id));
             
@@ -245,10 +408,73 @@ class Clientes extends CI_Controller{
                     'vendors/mask/jquery_3.2.1.min.js',
                     'vendors/mask/jquery.maskedinput.min.js',
                 ),
+                    
+                // Home
+                'soma_vendas' => $this->home_model->get_sum_vendas(),
+                'soma_servicos' => $this->home_model->get_sum_ordem_servicos(),
+                'soma_receber' => $this->home_model->get_sum_receber(),
+                'soma_pagar' => $this->home_model->get_sum_pagar(),
+                'soma_produtos' => $this->home_model->get_produtos_quantidade(),
+                'top_produtos' => $this->home_model->get_produtos_mais_vendidos(),
+                'top_servicos' => $this->home_model->get_servicos_mais_vendidos(), 
 
                 'cliente' => $this->core_model->get_by_id('clientes', array('cliente_id' => $cliente_id)),
 
             );
+                
+            //CENTRAL DE NOTIFICAÇÕES
+            $contador_notificacoes = 0;
+            if ($this->home_model->get_contas_receber_vencidas()) {
+
+                $data['contas_receber_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_receber_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencidas()) {
+
+                $data['contas_pagar_vencidas'] = TRUE;
+                $contador_notificacoes ++;
+            } 
+    //        else {
+    //            $data['contas_pagar_vencidas'] = FALSE;
+    //        }
+            if ($this->home_model->get_contas_pagar_vencem_hoje()) {
+
+                $data['contas_pagar_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_contas_receber_vencem_hoje()) {
+
+                $data['contas_receber_vence_hoje'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_usuarios_desativados()) {
+
+                $data['usuarios_desativados'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_produtos_sem_estoque()) {
+
+                $data['produto_sem_estoque'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->home_model->get_reclamacoes_pendentes()) {
+
+                $data['reclama_pendente'] = TRUE;
+                $contador_notificacoes ++;
+            }
+            if ($this->ion_auth->is_admin()) {
+               if ($this->home_model->get_tickets_pendentes()) {
+
+                    $data['ticket_pendente'] = TRUE;
+                    $contador_notificacoes ++;
+                } 
+            }
+
+
+            $data['contador_notificacoes'] = $contador_notificacoes;
                 
 //                echo '<pre>';
 //                print_r($data['cliente']);
@@ -279,16 +505,16 @@ class Clientes extends CI_Controller{
     }
     
     public function check_rg_ie($cliente_rg_ie) {
+        if ($this->input->post('cliente_rg_ie') != NULL) {
+            $cliente_id = $this->input->post('cliente_id');
         
-        $cliente_id = $this->input->post('cliente_id');
-        
-        if ($this->core_model->get_by_id('clientes', array('cliente_rg_ie' => $cliente_rg_ie, 'cliente_id !=' => $cliente_id))) {
-            $this->form_validation->set_message('check_rg_ie', 'Este documento já está cadatrado na base de dados');
-            return FALSE;
-        } else {
-            return TRUE;
+            if ($this->core_model->get_by_id('clientes', array('cliente_rg_ie' => $cliente_rg_ie, 'cliente_id !=' => $cliente_id))) {
+                $this->form_validation->set_message('check_rg_ie', 'Este documento já está cadatrado na base de dados');
+                return FALSE;
+            } else {
+                return TRUE;
+            }
         }
-        
     }
     
     public function check_email($cliente_email) {
@@ -297,6 +523,19 @@ class Clientes extends CI_Controller{
         
         if ($this->core_model->get_by_id('clientes', array('cliente_email' => $cliente_email, 'cliente_id !=' => $cliente_id))) {
             $this->form_validation->set_message('check_email', 'Este e-mail já está cadatrado na base de dados');
+            return FALSE;
+        } else {
+            return TRUE;
+        }
+        
+    }
+    
+    public function check_user($cliente_user) {
+        
+        $cliente_id = $this->input->post('cliente_id');
+        
+        if ($this->core_model->get_by_id('clientes', array('cliente_user' => $cliente_user, 'cliente_id !=' => $cliente_id))) {
+            $this->form_validation->set_message('check_user', 'Este usuário já está cadatrado na base de dados');
             return FALSE;
         } else {
             return TRUE;
